@@ -153,18 +153,6 @@ class _CreateMailState extends State<CreateMail> {
                   }).toList(),
                 ),
                 SizedBox(height: 15),
-                // Row(
-                //   children: [
-                //     Text(
-                //       'Status Surat',
-                //       style: TextStyle(
-                //           fontSize: 20,
-                //           fontWeight: FontWeight.bold,
-                //           color: textColor),
-                //     ),
-                //   ],
-                // ),
-                // SizedBox(height: 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -178,7 +166,10 @@ class _CreateMailState extends State<CreateMail> {
                               color: textColor),
                         ),
                         SizedBox(width: 10),
-                        Text("Approved / Not")
+                        Text(
+                          "Approved / Not",
+                          style: TextStyle(color: textColor),
+                        )
                       ],
                     ),
                     Switch(
