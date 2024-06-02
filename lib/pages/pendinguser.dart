@@ -5,12 +5,12 @@ import 'package:provider/provider.dart';
 import 'package:triumph2/provider/theme.dart';
 import 'package:triumph2/provider/mailprovider.dart';
 
-class Berstatus extends StatefulWidget {
+class PendingUser extends StatefulWidget {
   @override
-  _Berstatus createState() => _Berstatus();
+  _PendingUser createState() => _PendingUser();
 }
 
-class _Berstatus extends State<Berstatus> {
+class _PendingUser extends State<PendingUser> {
   late List<MailItem> _filteredmailss;
   late String _selectedFilter;
   late String _searchQuery;
@@ -27,6 +27,7 @@ class _Berstatus extends State<Berstatus> {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final ThemeData themeData = themeProvider.getCurrentTheme();
     final Color textColor = themeData.textTheme.bodyLarge!.color!;
+    themeProvider.enableDarkMode ? Colors.white : Colors.black;
     final Color chipBackgroundColor = themeProvider.enableDarkMode
         ? Colors.grey.shade700
         : Colors.grey.shade300;
@@ -39,11 +40,8 @@ class _Berstatus extends State<Berstatus> {
     final mailProvider = Provider.of<MailProvider>(context);
     _filteredmailss = _getFilteredMails(mailProvider.mailss);
 
-    final approvedMails = _filteredmailss
-        .where((mail) => mail.status == MailStatus.approved)
-        .toList();
-    final notApprovedMails = _filteredmailss
-        .where((mail) => mail.status == MailStatus.notApproved)
+    final pendingMails = _filteredmailss
+        .where((mail) => mail.status == MailStatus.pending)
         .toList();
 
     return Scaffold(
@@ -100,7 +98,7 @@ class _Berstatus extends State<Berstatus> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Approved / Not Mails',
+                      'Pending Mails',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -110,19 +108,11 @@ class _Berstatus extends State<Berstatus> {
                     ListView.builder(
                       shrinkWrap: true,
                       physics: NeverScrollableScrollPhysics(),
-                      itemCount: approvedMails.length + notApprovedMails.length,
+                      itemCount: pendingMails.length,
                       itemBuilder: (context, index) {
-                        if (index < approvedMails.length) {
-                          return _buildMailCard(approvedMails[index], textColor,
-                              themeProvider, mailProvider);
-                        } else {
-                          final notApprovedIndex = index - approvedMails.length;
-                          return _buildMailCard(
-                              notApprovedMails[notApprovedIndex],
-                              textColor,
-                              themeProvider,
-                              mailProvider);
-                        }
+                        final mails = pendingMails[index];
+                        return _buildMailCard(
+                            mails, textColor, themeProvider, mailProvider);
                       },
                     ),
                   ],

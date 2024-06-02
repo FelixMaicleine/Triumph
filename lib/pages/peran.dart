@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:triumph2/provider/theme.dart';
 
-class Landing extends StatefulWidget {
-  const Landing({super.key});
+class Peran extends StatefulWidget {
+  const Peran({super.key});
 
   @override
-  State<Landing> createState() => _Landing();
+  State<Peran> createState() => _Peran();
 }
 
-class _Landing extends State<Landing> {
+class _Peran extends State<Peran> {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
@@ -71,33 +71,40 @@ class _Landing extends State<Landing> {
                   children: [
                     ElevatedButton(
                       onPressed: () {
-                        Navigator.pushNamed(context, '/peran');
+                        Navigator.pushNamed(context, '/loginadmin');
                       },
                       style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.red,
                           minimumSize: Size(100, 50)),
                       child: Text(
-                        'Login',
-                        style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    SizedBox(width: 10.0),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/register');
-                      },
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
-                          minimumSize: Size(100, 50)),
-                      child: Text(
-                        'Register',
+                        'Admin',
                         style: TextStyle(
                             color: Colors.white, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ],
                 ),
+                SizedBox(
+                  height: 10,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/loginuser');
+                      },
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          minimumSize: Size(100, 50)),
+                      child: Text(
+                        'User',
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
+                )
               ],
             ),
           ),

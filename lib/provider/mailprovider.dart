@@ -11,12 +11,14 @@ class MailItem {
   final String isi;
   final String kategori;
   MailStatus status;
+  String? alasan;
 
   MailItem({
     required this.nama,
     required this.isi,
     this.kategori = 'Personal',
     this.status = MailStatus.pending,
+    this.alasan,
   });
 }
 
@@ -37,22 +39,34 @@ class MailProvider with ChangeNotifier {
   MailProvider() {
     _mailss = [
       MailItem(
-        nama: 'Surat izin',
+        nama: 'Surat Selamat Ultah',
+        isi: 'Selamat Ultah',
+        kategori: 'Personal',
+        status: MailStatus.approved,
+      ),
+      MailItem(
+          nama: 'Surat pengunduran diri',
+          isi: 'Surat pengunduran diri karyawan Z',
+          kategori: 'Work',
+          status: MailStatus.notApproved,
+          alasan: "perusahaan sedang butuh karyawan"),
+      MailItem(
+        nama: 'Surat izin A',
         isi: 'Surat izin sakit karyawan A',
         kategori: 'Work',
         status: MailStatus.pending,
       ),
       MailItem(
-        nama: 'Surat pengunduran diri',
-        isi: 'Surat pengunduran diri karyawan B',
+        nama: 'Surat izin B',
+        isi: 'Surat izin sakit karyawan B',
         kategori: 'Work',
-        status: MailStatus.notApproved,
+        status: MailStatus.pending,
       ),
       MailItem(
-        nama: 'Surat Selamat Ultah',
-        isi: 'Selamat Ultah',
-        kategori: 'Personal',
-        status: MailStatus.approved,
+        nama: 'Surat izin C',
+        isi: 'Surat izin sakit karyawan C',
+        kategori: 'Work',
+        status: MailStatus.pending,
       ),
     ];
   }
@@ -67,10 +81,13 @@ class MailProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void changeMailStatus(String nama, MailStatus newStatus) {
+  void changeMailStatus(String nama, MailStatus newStatus, {String? alasan}) {
     final mailIndex = _mailss.indexWhere((mail) => mail.nama == nama);
     if (mailIndex != -1) {
       _mailss[mailIndex].status = newStatus;
+      if (newStatus == MailStatus.notApproved) {
+        _mailss[mailIndex].alasan = alasan;
+      }
       notifyListeners();
     }
   }

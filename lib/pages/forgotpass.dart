@@ -197,7 +197,7 @@ class _ForgotPass extends State<ForgotPass> {
                 ),
                 TextButton(
                     onPressed: () {
-                      Navigator.pushNamed(context, '/login');
+                      Navigator.pushNamed(context, '/loginuser');
                     },
                     child: const Text(
                       'Login',

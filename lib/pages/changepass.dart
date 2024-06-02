@@ -54,12 +54,9 @@ class _ChangePass extends State<ChangePass> {
     // Melakukan validasi kata sandi sebelum mengubahnya
     if (_validatePassword(_newPassword) == null) {
       if (_newPassword == _confirmPassword) {
-        // Lakukan perubahan kata sandi di sini
-        // ...
-        // Redirect ke halaman login atau halaman lain setelah berhasil mengubah kata sandi
         Navigator.pushNamedAndRemoveUntil(
           context,
-          '/login',
+          '/loginuser',
           ModalRoute.withName('/'),
           arguments: {
             'line1': 'Your password has been changed successfully',
@@ -249,7 +246,7 @@ class _ChangePass extends State<ChangePass> {
                 ),
                 TextButton(
                     onPressed: () {
-                      Navigator.pushNamed(context, '/login');
+                      Navigator.pushNamed(context, '/loginuser');
                     },
                     child: const Text(
                       'Login',

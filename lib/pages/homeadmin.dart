@@ -5,12 +5,12 @@ import 'package:provider/provider.dart';
 import 'package:triumph2/provider/theme.dart';
 import 'package:triumph2/provider/mailprovider.dart';
 
-class Pending extends StatefulWidget {
+class HomeAdmin extends StatefulWidget {
   @override
-  _Pending createState() => _Pending();
+  _HomeAdmin createState() => _HomeAdmin();
 }
 
-class _Pending extends State<Pending> {
+class _HomeAdmin extends State<HomeAdmin> {
   late List<MailItem> _filteredmailss;
   late String _selectedFilter;
   late String _searchQuery;
@@ -27,7 +27,10 @@ class _Pending extends State<Pending> {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final ThemeData themeData = themeProvider.getCurrentTheme();
     final Color textColor = themeData.textTheme.bodyLarge!.color!;
-    themeProvider.enableDarkMode ? Colors.white : Colors.black;
+    final Color bottomNavBarColor =
+        themeProvider.enableDarkMode ? Colors.grey.shade900 : Colors.white;
+    final Color bottomNavBarIconColor =
+        themeProvider.enableDarkMode ? Colors.white : Colors.black;
     final Color chipBackgroundColor = themeProvider.enableDarkMode
         ? Colors.grey.shade700
         : Colors.grey.shade300;
@@ -43,19 +46,27 @@ class _Pending extends State<Pending> {
     final pendingMails = _filteredmailss
         .where((mail) => mail.status == MailStatus.pending)
         .toList();
+    final approvedMails = _filteredmailss
+        .where((mail) => mail.status == MailStatus.approved)
+        .toList();
+    final notApprovedMails = _filteredmailss
+        .where((mail) => mail.status == MailStatus.notApproved)
+        .toList();
 
     return Scaffold(
       appBar: AppBar(
         backgroundColor:
             themeProvider.enableDarkMode ? Colors.grey.shade900 : Colors.white,
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios,
-            color: Colors.red,
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: Icon(
+              Icons.menu,
+              color: textColor,
+            ),
+            onPressed: () {
+              Scaffold.of(context).openDrawer();
+            },
           ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
         ),
         title: Image.asset(
           'assets/logo.png',
@@ -76,6 +87,105 @@ class _Pending extends State<Pending> {
             ),
           ),
         ],
+      ),
+      drawer: Drawer(
+        child: Container(
+            color: themeProvider.enableDarkMode
+                ? Colors.grey.shade900
+                : Colors.white,
+            child: Column(
+              children: [
+                Expanded(
+                  child: ListView(
+                    padding: EdgeInsets.zero,
+                    children: <Widget>[
+                      DrawerHeader(
+                        decoration: BoxDecoration(
+                          color: themeProvider.enableDarkMode
+                              ? Colors.grey.shade800
+                              : Colors.red,
+                        ),
+                        padding: EdgeInsets.fromLTRB(10, 30, 10, 10),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            CircleAvatar(
+                              radius: 40.0,
+                              backgroundColor: Colors.white,
+                              child: Icon(
+                                Icons.person,
+                                size: 50.0,
+                                color: Colors.red,
+                              ),
+                            ),
+                            SizedBox(height: 10),
+                            Text(
+                              'John Doe',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      ListTile(
+                        leading: Icon(
+                          Icons.person,
+                          color: textColor,
+                        ),
+                        title: Text(
+                          'Profile',
+                          style: TextStyle(color: textColor),
+                        ),
+                        onTap: () {
+                          Navigator.pushNamed(context, '/profile');
+                        },
+                      ),
+                      ListTile(
+                        leading: Icon(
+                          Icons.mail,
+                          color: textColor,
+                        ),
+                        title: Text(
+                          'Surat Masuk',
+                          style: TextStyle(color: textColor),
+                        ),
+                        onTap: () {
+                          Navigator.pushNamed(context, '/pendingadmin');
+                        },
+                      ),
+                      ListTile(
+                        leading: Icon(
+                          Icons.send,
+                          color: textColor,
+                        ),
+                        title: Text(
+                          'Surat Keluar',
+                          style: TextStyle(color: textColor),
+                        ),
+                        onTap: () {
+                          Navigator.pushNamed(context, '/berstatus');
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                ListTile(
+                  leading: Icon(
+                    Icons.logout,
+                    color: textColor,
+                  ),
+                  title: Text(
+                    'Logout',
+                    style: TextStyle(color: textColor),
+                  ),
+                  onTap: () {
+                    Navigator.pushNamed(context, '/');
+                  },
+                ),
+              ],
+            )),
       ),
       body: Container(
         height: 5000,
@@ -98,7 +208,7 @@ class _Pending extends State<Pending> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Pending Mails',
+                      'Surat Masuk',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -113,6 +223,33 @@ class _Pending extends State<Pending> {
                         final mails = pendingMails[index];
                         return _buildMailCard(
                             mails, textColor, themeProvider, mailProvider);
+                      },
+                    ),
+                    SizedBox(height: 20),
+                    Text(
+                      'Surat Keluar',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: textColor,
+                      ),
+                    ),
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: approvedMails.length + notApprovedMails.length,
+                      itemBuilder: (context, index) {
+                        if (index < approvedMails.length) {
+                          return _buildMailCard(approvedMails[index], textColor,
+                              themeProvider, mailProvider);
+                        } else {
+                          final notApprovedIndex = index - approvedMails.length;
+                          return _buildMailCard(
+                              notApprovedMails[notApprovedIndex],
+                              textColor,
+                              themeProvider,
+                              mailProvider);
+                        }
                       },
                     ),
                   ],
@@ -163,6 +300,26 @@ class _Pending extends State<Pending> {
             ),
           ],
         ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: bottomNavBarColor,
+        selectedItemColor: Colors.red,
+        unselectedItemColor: bottomNavBarIconColor,
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.mail),
+            label: 'Buat Surat',
+          ),
+        ],
+        onTap: (int index) {
+          if (index == 1) {
+            Navigator.pushNamed(context, '/create');
+          }
+        },
       ),
     );
   }
@@ -223,9 +380,38 @@ class _Pending extends State<Pending> {
               ],
             ),
             SizedBox(height: 5),
-            Text(
-              'Isi: ${mails.isi}',
-              style: TextStyle(color: textColor),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Isi: ${mails.isi}',
+                  style: TextStyle(color: textColor),
+                ),
+                if (mails.status == MailStatus.pending)
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: Icon(
+                          Icons.check,
+                          color: Colors.green,
+                        ),
+                        onPressed: () {
+                          mailProvider.changeMailStatus(
+                              mails.nama, MailStatus.approved);
+                        },
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          Icons.clear,
+                          color: Colors.red,
+                        ),
+                        onPressed: () {
+                          _showNotApprovedDialog(context, mails, mailProvider);
+                        },
+                      ),
+                    ],
+                  ),
+              ],
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -234,6 +420,21 @@ class _Pending extends State<Pending> {
                   'Kategori: ${mails.kategori}',
                   style: TextStyle(color: textColor),
                 ),
+              ],
+            ),
+            if (mails.status == MailStatus.notApproved && mails.alasan != null)
+              Text(
+                'Alasan : ${mails.alasan}',
+                style: TextStyle(color: Colors.red),
+              ),
+            if (mails.status == MailStatus.notApproved && mails.alasan == null)
+              Text(
+                'Surat tidak disetujui tanpa alasan.',
+                style: TextStyle(color: Colors.red),
+              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
                 IconButton(
                   icon: Icon(
                     Icons.delete,
@@ -249,6 +450,40 @@ class _Pending extends State<Pending> {
           ],
         ),
       ),
+    );
+  }
+
+  void _showNotApprovedDialog(
+      BuildContext context, MailItem mail, MailProvider mailProvider) {
+    TextEditingController _alasanController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Alasan Tidak Disetujui'),
+          content: TextField(
+            controller: _alasanController,
+            decoration: InputDecoration(labelText: 'Alasan'),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Batal'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Simpan'),
+              onPressed: () {
+                String alasan = _alasanController.text;
+                mailProvider.changeMailStatus(mail.nama, MailStatus.notApproved,
+                    alasan: alasan);
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 

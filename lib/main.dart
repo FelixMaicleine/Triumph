@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:triumph2/pages/berstatus.dart';
-import 'package:triumph2/pages/pending.dart';
+import 'package:triumph2/pages/homeadmin.dart';
+import 'package:triumph2/pages/loginadmin.dart';
+import 'package:triumph2/pages/pendingadmin.dart';
+import 'package:triumph2/pages/pendinguser.dart';
+import 'package:triumph2/pages/peran.dart';
 import 'package:triumph2/pages/profile.dart';
 import 'package:triumph2/pages/landing.dart';
-import 'package:triumph2/pages/login.dart';
+import 'package:triumph2/pages/loginuser.dart';
 import 'package:triumph2/pages/register.dart';
 import 'package:triumph2/pages/forgotpass.dart';
 import 'package:triumph2/pages/verifcode.dart';
 import 'package:triumph2/pages/changepass.dart';
-import 'package:triumph2/pages/home.dart';
+import 'package:triumph2/pages/homeuser.dart';
 import 'package:triumph2/pages/mail.dart';
 
 import 'package:provider/provider.dart';
@@ -35,15 +39,19 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => Landing(),
-        '/login': (context) => Login(),
+        '/peran': (context) => Peran(),
+        '/loginuser': (context) => LoginUser(),
+        '/loginadmin': (context) => LoginAdmin(),
         '/register': (context) => Register(),
         '/forgot': (context) => ForgotPass(),
         '/verify': (context) => VerifCode(),
         '/change': (context) => ChangePass(),
-        '/home': (context) => Home(),
+        '/homeuser': (context) => HomeUser(),
+        '/homeadmin': (context) => HomeAdmin(),
         '/create': (context) => CreateMail(),
         '/profile': (context) => Profile(),
-        '/pending': (context) => Pending(),
+        '/pendinguser': (context) => PendingUser(),
+        '/pendingadmin': (context) => PendingAdmin(),
         '/berstatus': (context) => Berstatus(),
       },
     );

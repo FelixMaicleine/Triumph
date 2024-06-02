@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:triumph2/provider/theme.dart';
 
-class Login extends StatefulWidget {
-  const Login({super.key});
+class LoginAdmin extends StatefulWidget {
+  const LoginAdmin({super.key});
 
   @override
-  State<Login> createState() => _Login();
+  State<LoginAdmin> createState() => _LoginAdmin();
 }
 
-class _Login extends State<Login> {
+class _LoginAdmin extends State<LoginAdmin> {
   final TextEditingController _usernameController = TextEditingController();
 
   Map<String, String>? _message;
@@ -231,7 +231,7 @@ class _Login extends State<Login> {
                     ? () {
                         Navigator.pushNamedAndRemoveUntil(
                           context,
-                          '/home',
+                          '/homeadmin',
                           ModalRoute.withName('/'),
                         );
                       }

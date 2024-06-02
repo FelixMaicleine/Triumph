@@ -5,12 +5,12 @@ import 'package:provider/provider.dart';
 import 'package:triumph2/provider/theme.dart';
 import 'package:triumph2/provider/mailprovider.dart';
 
-class Berstatus extends StatefulWidget {
+class HomeUser extends StatefulWidget {
   @override
-  _Berstatus createState() => _Berstatus();
+  _HomeUser createState() => _HomeUser();
 }
 
-class _Berstatus extends State<Berstatus> {
+class _HomeUser extends State<HomeUser> {
   late List<MailItem> _filteredmailss;
   late String _selectedFilter;
   late String _searchQuery;
@@ -27,6 +27,10 @@ class _Berstatus extends State<Berstatus> {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final ThemeData themeData = themeProvider.getCurrentTheme();
     final Color textColor = themeData.textTheme.bodyLarge!.color!;
+    final Color bottomNavBarColor =
+        themeProvider.enableDarkMode ? Colors.grey.shade900 : Colors.white;
+    final Color bottomNavBarIconColor =
+        themeProvider.enableDarkMode ? Colors.white : Colors.black;
     final Color chipBackgroundColor = themeProvider.enableDarkMode
         ? Colors.grey.shade700
         : Colors.grey.shade300;
@@ -39,6 +43,9 @@ class _Berstatus extends State<Berstatus> {
     final mailProvider = Provider.of<MailProvider>(context);
     _filteredmailss = _getFilteredMails(mailProvider.mailss);
 
+    final pendingMails = _filteredmailss
+        .where((mail) => mail.status == MailStatus.pending)
+        .toList();
     final approvedMails = _filteredmailss
         .where((mail) => mail.status == MailStatus.approved)
         .toList();
@@ -50,14 +57,16 @@ class _Berstatus extends State<Berstatus> {
       appBar: AppBar(
         backgroundColor:
             themeProvider.enableDarkMode ? Colors.grey.shade900 : Colors.white,
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios,
-            color: Colors.red,
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: Icon(
+              Icons.menu,
+              color: textColor,
+            ),
+            onPressed: () {
+              Scaffold.of(context).openDrawer();
+            },
           ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
         ),
         title: Image.asset(
           'assets/logo.png',
@@ -78,6 +87,105 @@ class _Berstatus extends State<Berstatus> {
             ),
           ),
         ],
+      ),
+      drawer: Drawer(
+        child: Container(
+            color: themeProvider.enableDarkMode
+                ? Colors.grey.shade900
+                : Colors.white,
+            child: Column(
+              children: [
+                Expanded(
+                  child: ListView(
+                    padding: EdgeInsets.zero,
+                    children: <Widget>[
+                      DrawerHeader(
+                        decoration: BoxDecoration(
+                          color: themeProvider.enableDarkMode
+                              ? Colors.grey.shade800
+                              : Colors.red,
+                        ),
+                        padding: EdgeInsets.fromLTRB(10, 30, 10, 10),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            CircleAvatar(
+                              radius: 40.0,
+                              backgroundColor: Colors.white,
+                              child: Icon(
+                                Icons.person,
+                                size: 50.0,
+                                color: Colors.red,
+                              ),
+                            ),
+                            SizedBox(height: 10),
+                            Text(
+                              'John Doe',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      ListTile(
+                        leading: Icon(
+                          Icons.person,
+                          color: textColor,
+                        ),
+                        title: Text(
+                          'Profile',
+                          style: TextStyle(color: textColor),
+                        ),
+                        onTap: () {
+                          Navigator.pushNamed(context, '/profile');
+                        },
+                      ),
+                      ListTile(
+                        leading: Icon(
+                          Icons.mail,
+                          color: textColor,
+                        ),
+                        title: Text(
+                          'Surat Masuk',
+                          style: TextStyle(color: textColor),
+                        ),
+                        onTap: () {
+                          Navigator.pushNamed(context, '/berstatus');
+                        },
+                      ),
+                      ListTile(
+                        leading: Icon(
+                          Icons.send,
+                          color: textColor,
+                        ),
+                        title: Text(
+                          'Surat Keluar',
+                          style: TextStyle(color: textColor),
+                        ),
+                        onTap: () {
+                          Navigator.pushNamed(context, '/pendinguser');
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                ListTile(
+                  leading: Icon(
+                    Icons.logout,
+                    color: textColor,
+                  ),
+                  title: Text(
+                    'Logout',
+                    style: TextStyle(color: textColor),
+                  ),
+                  onTap: () {
+                    Navigator.pushNamed(context, '/');
+                  },
+                ),
+              ],
+            )),
       ),
       body: Container(
         height: 5000,
@@ -100,7 +208,7 @@ class _Berstatus extends State<Berstatus> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Approved / Not Mails',
+                      'Surat Masuk',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -123,6 +231,25 @@ class _Berstatus extends State<Berstatus> {
                               themeProvider,
                               mailProvider);
                         }
+                      },
+                    ),
+                    SizedBox(height: 20),
+                    Text(
+                      'Surat Keluar',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: textColor,
+                      ),
+                    ),
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: pendingMails.length,
+                      itemBuilder: (context, index) {
+                        final mails = pendingMails[index];
+                        return _buildMailCard(
+                            mails, textColor, themeProvider, mailProvider);
                       },
                     ),
                   ],
@@ -173,6 +300,26 @@ class _Berstatus extends State<Berstatus> {
             ),
           ],
         ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: bottomNavBarColor,
+        selectedItemColor: Colors.red,
+        unselectedItemColor: bottomNavBarIconColor,
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.mail),
+            label: 'Buat Surat',
+          ),
+        ],
+        onTap: (int index) {
+          if (index == 1) {
+            Navigator.pushNamed(context, '/create');
+          }
+        },
       ),
     );
   }

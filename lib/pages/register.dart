@@ -93,7 +93,7 @@ class _Register extends State<Register> {
     // Handle register logic here
     Navigator.pushNamedAndRemoveUntil(
       context,
-      '/login',
+      '/loginuser',
       ModalRoute.withName('/'),
       arguments: {
         'line1': 'Your account has been created successfully',
@@ -530,7 +530,7 @@ class _Register extends State<Register> {
                         ),
                         TextButton(
                           onPressed: () {
-                            Navigator.pushNamed(context, '/login');
+                            Navigator.pushNamed(context, '/loginuser');
                           },
                           child: Text(
                             'Login',
