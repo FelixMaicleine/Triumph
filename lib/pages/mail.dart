@@ -14,7 +14,6 @@ class _CreateMailState extends State<CreateMail> {
   TextEditingController _namaController = TextEditingController();
   TextEditingController _isiController = TextEditingController();
   String _selectedCategory = 'Personal';
-  bool _isApproved = false;
 
   @override
   Widget build(BuildContext context) {
@@ -152,38 +151,6 @@ class _CreateMailState extends State<CreateMail> {
                     );
                   }).toList(),
                 ),
-                SizedBox(height: 15),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          'Status',
-                          style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: textColor),
-                        ),
-                        SizedBox(width: 10),
-                        Text(
-                          "Approved / Not",
-                          style: TextStyle(color: textColor),
-                        )
-                      ],
-                    ),
-                    Switch(
-                      value: _isApproved,
-                      onChanged: (value) {
-                        setState(() {
-                          _isApproved = value;
-                        });
-                      },
-                      activeColor: Colors.green,
-                      inactiveThumbColor: Colors.red,
-                    ),
-                  ],
-                ),
                 SizedBox(height: 20),
                 Row(
                   children: [
@@ -211,7 +178,6 @@ class _CreateMailState extends State<CreateMail> {
                             nama: _namaController.text,
                             isi: _isiController.text,
                             kategori: _selectedCategory,
-                            approved: _isApproved,
                           );
                           mailProvider.addMail(newMail);
                           Navigator.pop(context);

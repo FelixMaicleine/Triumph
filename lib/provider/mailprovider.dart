@@ -1,16 +1,22 @@
 import 'package:flutter/material.dart';
 
+enum MailStatus {
+  pending,
+  approved,
+  notApproved,
+}
+
 class MailItem {
   final String nama;
   final String isi;
   final String kategori;
-  final bool approved;
+  MailStatus status;
 
   MailItem({
     required this.nama,
     required this.isi,
     this.kategori = 'Personal',
-    this.approved = false,
+    this.status = MailStatus.pending,
   });
 }
 
@@ -19,26 +25,34 @@ class MailProvider with ChangeNotifier {
 
   List<MailItem> get mailss => _mailss;
 
+  List<MailItem> get pendingMails =>
+      _mailss.where((mail) => mail.status == MailStatus.pending).toList();
+
+  List<MailItem> get approvedMails =>
+      _mailss.where((mail) => mail.status == MailStatus.approved).toList();
+
+  List<MailItem> get notApprovedMails =>
+      _mailss.where((mail) => mail.status == MailStatus.notApproved).toList();
+
   MailProvider() {
-    // Add default mails
     _mailss = [
-      MailItem(
-        nama: 'Surat Selamat Ultah',
-        isi: 'Selamat Ultah',
-        kategori: 'Personal',
-        approved: true,
-      ),
       MailItem(
         nama: 'Surat izin',
         isi: 'Surat izin sakit karyawan A',
         kategori: 'Work',
-        approved: false,
+        status: MailStatus.pending,
       ),
       MailItem(
         nama: 'Surat pengunduran diri',
         isi: 'Surat pengunduran diri karyawan B',
         kategori: 'Work',
-        approved: false,
+        status: MailStatus.notApproved,
+      ),
+      MailItem(
+        nama: 'Surat Selamat Ultah',
+        isi: 'Selamat Ultah',
+        kategori: 'Personal',
+        status: MailStatus.approved,
       ),
     ];
   }
@@ -51,5 +65,13 @@ class MailProvider with ChangeNotifier {
   void deleteMail(String nama) {
     _mailss.removeWhere((mail) => mail.nama == nama);
     notifyListeners();
+  }
+
+  void changeMailStatus(String nama, MailStatus newStatus) {
+    final mailIndex = _mailss.indexWhere((mail) => mail.nama == nama);
+    if (mailIndex != -1) {
+      _mailss[mailIndex].status = newStatus;
+      notifyListeners();
+    }
   }
 }

@@ -12,6 +12,8 @@ class Login extends StatefulWidget {
 }
 
 class _Login extends State<Login> {
+  final TextEditingController _usernameController = TextEditingController();
+
   Map<String, String>? _message;
 
   int? _staySignedIn;
@@ -100,6 +102,7 @@ class _Login extends State<Login> {
                 children: [
                   Expanded(
                     child: TextField(
+                      controller: _usernameController,
                       style: TextStyle(color: textColor),
                       decoration: InputDecoration(
                         border: OutlineInputBorder(
@@ -201,7 +204,7 @@ class _Login extends State<Login> {
                     },
                     child: const Text(
                       'Forgot Password?',
-                      style: TextStyle(color: Colors.blue),
+                      style: TextStyle(color: Colors.yellow),
                     ),
                   )
                 ],
@@ -262,7 +265,7 @@ class _Login extends State<Login> {
                       'Register',
                       style: TextStyle(
                         fontSize: 15.0,
-                        color: Colors.blue,
+                        color: Colors.yellow,
                       ),
                     ),
                   ),

@@ -201,7 +201,7 @@ class _ForgotPass extends State<ForgotPass> {
                     },
                     child: const Text(
                       'Login',
-                      style: TextStyle(color: Colors.blue),
+                      style: TextStyle(color: Colors.yellow),
                     )),
                 Text("/"),
                 TextButton(
@@ -210,7 +210,7 @@ class _ForgotPass extends State<ForgotPass> {
                     },
                     child: const Text(
                       'Register',
-                      style: TextStyle(color: Colors.blue),
+                      style: TextStyle(color: Colors.yellow),
                     )),
               ],
             )

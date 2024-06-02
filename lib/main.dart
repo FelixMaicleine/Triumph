@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:triumph2/provider/theme.dart';
-import 'package:triumph2/provider/mailprovider.dart';
+import 'package:triumph2/pages/berstatus.dart';
+import 'package:triumph2/pages/pending.dart';
+import 'package:triumph2/pages/profile.dart';
 import 'package:triumph2/pages/landing.dart';
 import 'package:triumph2/pages/login.dart';
 import 'package:triumph2/pages/register.dart';
@@ -10,6 +10,10 @@ import 'package:triumph2/pages/verifcode.dart';
 import 'package:triumph2/pages/changepass.dart';
 import 'package:triumph2/pages/home.dart';
 import 'package:triumph2/pages/mail.dart';
+
+import 'package:provider/provider.dart';
+import 'package:triumph2/provider/theme.dart';
+import 'package:triumph2/provider/mailprovider.dart';
 
 void main() {
   runApp(
@@ -38,6 +42,9 @@ class MyApp extends StatelessWidget {
         '/change': (context) => ChangePass(),
         '/home': (context) => Home(),
         '/create': (context) => CreateMail(),
+        '/profile': (context) => Profile(),
+        '/pending': (context) => Pending(),
+        '/berstatus': (context) => Berstatus(),
       },
     );
   }

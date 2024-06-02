@@ -536,7 +536,7 @@ class _Register extends State<Register> {
                             'Login',
                             style: TextStyle(
                               fontSize: 15.0,
-                              color: Colors.blue,
+                              color: Colors.yellow,
                             ),
                           ),
                         ),

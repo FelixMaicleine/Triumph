@@ -253,7 +253,7 @@ class _ChangePass extends State<ChangePass> {
                     },
                     child: const Text(
                       'Login',
-                      style: TextStyle(color: Colors.blue),
+                      style: TextStyle(color: Colors.yellow),
                     )),
                 Text("/"),
                 TextButton(
@@ -262,7 +262,7 @@ class _ChangePass extends State<ChangePass> {
                     },
                     child: const Text(
                       'Register',
-                      style: TextStyle(color: Colors.blue),
+                      style: TextStyle(color: Colors.yellow),
                     )),
               ],
             )
