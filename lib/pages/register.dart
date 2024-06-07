@@ -222,9 +222,6 @@ class _Register extends State<Register> {
                         ),
                       ],
                     ),
-                    SizedBox(
-                      height: 10,
-                    ),
                     Row(
                       children: [
                         Text(
@@ -259,7 +256,7 @@ class _Register extends State<Register> {
                       ],
                     ),
                     SizedBox(
-                      height: 10,
+                      height: 20,
                     ),
                     Row(
                       children: [
@@ -295,7 +292,7 @@ class _Register extends State<Register> {
                       ],
                     ),
                     SizedBox(
-                      height: 10,
+                      height: 20,
                     ),
                     Row(
                       children: [
@@ -348,6 +345,7 @@ class _Register extends State<Register> {
                         ),
                       ],
                     ),
+                    SizedBox(height: 20),
                     Row(
                       children: [
                         Text(
@@ -381,7 +379,7 @@ class _Register extends State<Register> {
                       ],
                     ),
                     SizedBox(
-                      height: 10,
+                      height: 20,
                     ),
                     Row(
                       children: [
@@ -431,9 +429,6 @@ class _Register extends State<Register> {
                         ),
                       ],
                     ),
-                    SizedBox(
-                      height: 10,
-                    ),
                     Row(
                       children: [
                         Text(
@@ -480,9 +475,6 @@ class _Register extends State<Register> {
                               color: Colors.white, backgroundColor: Colors.red),
                         ),
                       ],
-                    ),
-                    SizedBox(
-                      height: 10,
                     ),
                     Row(
                       children: [

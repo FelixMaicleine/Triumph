@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, use_key_in_widget_constructors, library_private_types_in_public_api, prefer_final_fields, prefer_const_literals_to_create_immutables, use_super_parameters
+// ignore_for_file: prefer_const_constructors, use_key_in_widget_constructors, library_private_types_in_public_api, prefer_final_fields, prefer_const_literals_to_create_immutables, use_super_parameters, no_leading_underscores_for_local_identifiers, unused_element
 
 import 'package:flutter/material.dart';
 import 'dart:io';
@@ -6,12 +6,12 @@ import 'package:provider/provider.dart';
 import 'package:triumph2/provider/theme.dart';
 import 'package:triumph2/provider/mailprovider.dart';
 
-class PendingAdmin extends StatefulWidget {
+class MailsAdmin extends StatefulWidget {
   @override
-  _PendingAdmin createState() => _PendingAdmin();
+  _MailsAdmin createState() => _MailsAdmin();
 }
 
-class _PendingAdmin extends State<PendingAdmin> {
+class _MailsAdmin extends State<MailsAdmin> {
   late List<MailItem> _filteredmailss;
   late String _selectedFilter;
   late String _searchQuery;
@@ -28,23 +28,26 @@ class _PendingAdmin extends State<PendingAdmin> {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final ThemeData themeData = themeProvider.getCurrentTheme();
     final Color textColor = themeData.textTheme.bodyLarge!.color!;
-    themeProvider.enableDarkMode ? Colors.white : Colors.black;
+    final Color bottomNavBarColor =
+        themeProvider.enableDarkMode ? Colors.grey.shade900 : Colors.white;
     final Color chipBackgroundColor = themeProvider.enableDarkMode
         ? Colors.grey.shade700
         : Colors.grey.shade300;
     final Color chipSelectedColor = themeProvider.enableDarkMode
         ? Colors.red.shade800
         : Colors.red.shade400;
-    final Color chipLabelColor =
-        themeProvider.enableDarkMode ? Colors.white : Colors.black;
-    final Color bottomNavBarColor =
-        themeProvider.enableDarkMode ? Colors.grey.shade900 : Colors.white;
     final Color cardColor =
         themeProvider.enableDarkMode ? Colors.grey.shade800 : Colors.white;
     final mailProvider = Provider.of<MailProvider>(context);
     _filteredmailss = _getFilteredMails(mailProvider.mailss);
     final pendingMails = _filteredmailss
         .where((mail) => mail.status == MailStatus.pending)
+        .toList();
+    final approvedMails = _filteredmailss
+        .where((mail) => mail.status == MailStatus.approved)
+        .toList();
+    final notApprovedMails = _filteredmailss
+        .where((mail) => mail.status == MailStatus.notApproved)
         .toList();
 
     return Scaffold(
@@ -101,7 +104,7 @@ class _PendingAdmin extends State<PendingAdmin> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Pending Mails',
+                      'Surat Masuk',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -110,6 +113,17 @@ class _PendingAdmin extends State<PendingAdmin> {
                     ),
                     _buildExpansionPanelList(
                         pendingMails, textColor, cardColor, mailProvider),
+                    SizedBox(height: 20),
+                    Text(
+                      'Surat Keluar',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: textColor,
+                      ),
+                    ),
+                    _buildExpansionPanelList(approvedMails + notApprovedMails,
+                        textColor, cardColor, mailProvider),
                   ],
                 ),
               ),
@@ -142,14 +156,14 @@ class _PendingAdmin extends State<PendingAdmin> {
                   Wrap(
                     spacing: 8.0,
                     children: [
-                      _buildFilterChip('All', chipLabelColor,
+                      _buildFilterChip('All', textColor, chipBackgroundColor,
+                          chipSelectedColor),
+                      _buildFilterChip('Personal', textColor,
                           chipBackgroundColor, chipSelectedColor),
-                      _buildFilterChip('Personal', chipLabelColor,
-                          chipBackgroundColor, chipSelectedColor),
-                      _buildFilterChip('Work', chipLabelColor,
-                          chipBackgroundColor, chipSelectedColor),
-                      _buildFilterChip('Others', chipLabelColor,
-                          chipBackgroundColor, chipSelectedColor),
+                      _buildFilterChip('Work', textColor, chipBackgroundColor,
+                          chipSelectedColor),
+                      _buildFilterChip('Others', textColor, chipBackgroundColor,
+                          chipSelectedColor),
                     ],
                   ),
                   SizedBox(height: 10),
@@ -165,8 +179,8 @@ class _PendingAdmin extends State<PendingAdmin> {
         unselectedItemColor: textColor,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.archive),
-            label: 'Inbox',
+            icon: Icon(Icons.mail),
+            label: 'Mails',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
@@ -346,17 +360,36 @@ class _PendingAdmin extends State<PendingAdmin> {
     }
   }
 
+  Widget _buildFilterChip(String label, Color textColor,
+      Color chipBackgroundColor, Color chipSelectedColor) {
+    return ChoiceChip(
+      label: Text(label),
+      selected: _selectedFilter == label,
+      onSelected: (selected) {
+        setState(() {
+          _selectedFilter = label;
+        });
+      },
+      selectedColor: chipSelectedColor,
+      backgroundColor: chipBackgroundColor,
+      labelStyle: TextStyle(
+        color: _selectedFilter == label ? Colors.white : textColor,
+      ),
+    );
+  }
+
   void _showNotApprovedDialog(
       BuildContext context, MailItem mail, MailProvider mailProvider) {
-    TextEditingController _alasanController = TextEditingController();
+    TextEditingController _reasonController = TextEditingController();
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Alasan Tidak Disetujui'),
+          title: Text('Alasan tidak disetujui'),
           content: TextField(
-            controller: _alasanController,
-            decoration: InputDecoration(labelText: 'Alasan'),
+            controller: _reasonController,
+            decoration: InputDecoration(hintText: 'Masukkan alasan'),
           ),
           actions: <Widget>[
             TextButton(
@@ -366,11 +399,11 @@ class _PendingAdmin extends State<PendingAdmin> {
               },
             ),
             TextButton(
-              child: Text('Simpan'),
+              child: Text('Kirim'),
               onPressed: () {
-                String alasan = _alasanController.text;
+                String reason = _reasonController.text.trim();
                 mailProvider.changeMailStatus(mail.nama, MailStatus.notApproved,
-                    alasan: alasan);
+                    alasan: reason);
                 Navigator.of(context).pop();
               },
             ),
@@ -380,41 +413,25 @@ class _PendingAdmin extends State<PendingAdmin> {
     );
   }
 
-  FilterChip _buildFilterChip(String label, Color chipLabelColor,
-      Color chipBackgroundColor, Color chipSelectedColor) {
-    return FilterChip(
-      label: Text(label),
-      labelStyle: TextStyle(color: chipLabelColor),
-      backgroundColor: chipBackgroundColor,
-      selectedColor: chipSelectedColor,
-      selected: _selectedFilter == label,
-      onSelected: (isSelected) {
-        setState(() {
-          _selectedFilter = label;
-        });
-      },
-    );
-  }
-
   void _showDeleteConfirmationDialog(
-      BuildContext context, String nama, MailProvider mailProvider) {
+      BuildContext context, String mailName, MailProvider mailProvider) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Konfirmasi'),
+          title: Text('Konfirmasi Hapus'),
           content: Text('Apakah Anda yakin ingin menghapus surat ini?'),
           actions: <Widget>[
             TextButton(
-              child: Text('Tidak'),
+              child: Text('Batal'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: Text('Ya'),
+              child: Text('Hapus'),
               onPressed: () {
-                mailProvider.deleteMail(nama);
+                mailProvider.deleteMail(mailName);
                 Navigator.of(context).pop();
               },
             ),

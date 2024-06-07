@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:triumph2/provider/theme.dart';
 import 'package:triumph2/provider/mailprovider.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 class CreateMail extends StatefulWidget {
   @override
@@ -14,6 +16,18 @@ class _CreateMailState extends State<CreateMail> {
   TextEditingController _namaController = TextEditingController();
   TextEditingController _isiController = TextEditingController();
   String _selectedCategory = 'Personal';
+  File? _selectedImage; // Add this field to hold the selected image
+
+  // Function to pick image
+  Future<void> _pickImage() async {
+    final pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _selectedImage = File(pickedFile.path);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -154,6 +168,51 @@ class _CreateMailState extends State<CreateMail> {
                 SizedBox(height: 20),
                 Row(
                   children: [
+                    Text(
+                      'Gambar Surat',
+                      style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: textColor),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    ElevatedButton.icon(
+                      onPressed: _pickImage,
+                      icon: Icon(
+                        Icons.photo_library,
+                        color: Colors.white,
+                      ),
+                      label: Text(
+                        'Pick Image',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          minimumSize: Size(220, 50)),
+                    ),
+                    SizedBox(width: 10),
+                    if (_selectedImage != null)
+                      Image.file(
+                        _selectedImage!,
+                        height: 100,
+                        width: 100,
+                        fit: BoxFit.cover,
+                      ),
+                    if (_selectedImage == null)
+                      Text(
+                        'No image selected.',
+                        style: TextStyle(color: textColor),
+                      ),
+                  ],
+                ),
+                SizedBox(height: 20),
+                Row(
+                  children: [
                     Expanded(
                         child: ElevatedButton(
                       onPressed: () {
@@ -179,6 +238,9 @@ class _CreateMailState extends State<CreateMail> {
                             isi: _isiController.text,
                             kategori: _selectedCategory,
                           );
+                          if (_selectedImage != null) {
+                            newMail.imagePath = _selectedImage!.path;
+                          }
                           mailProvider.addMail(newMail);
                           Navigator.pop(context);
                         },

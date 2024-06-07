@@ -149,6 +149,38 @@ class _LoginAdmin extends State<LoginAdmin> {
                   ),
                 ],
               ),
+              SizedBox(height: 10),
+              Row(
+                children: [
+                  Text(
+                    'Admin Code',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: textColor,
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      style: TextStyle(color: textColor),
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                          borderSide: BorderSide(color: textColor),
+                        ),
+                        hintText: 'Enter your admin code',
+                        hintStyle: TextStyle(color: textColor),
+                        prefixIcon: Icon(Icons.lock, color: textColor),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

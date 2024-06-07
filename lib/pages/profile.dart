@@ -89,7 +89,7 @@ class _ProfileState extends State<Profile> {
                     ),
                     SizedBox(height: 20.0),
                     Text(
-                      'John Doe',
+                      'Felix Maicleine',
                       style: TextStyle(
                           fontSize: 24.0,
                           fontWeight: FontWeight.bold,
@@ -97,7 +97,7 @@ class _ProfileState extends State<Profile> {
                     ),
                     SizedBox(height: 5.0),
                     Text(
-                      '@johndoe',
+                      '@felix123',
                       style: TextStyle(
                         fontSize: 16.0,
                         color: textColor.withOpacity(0.7),
@@ -113,7 +113,7 @@ class _ProfileState extends State<Profile> {
                         SizedBox(width: 10.0),
                         Expanded(
                           child: Text(
-                            'johndoe@gmail.com',
+                            'felixmaicleine@gmail.com',
                             style: TextStyle(
                               fontSize: 16.0,
                               color: textColor,
@@ -138,6 +138,23 @@ class _ProfileState extends State<Profile> {
                         ),
                       ],
                     ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pushNamed(context, '/editprofile');
+                          },
+                          child: const Text(
+                            'Edit Profile',
+                            style: TextStyle(
+                              fontSize: 15.0,
+                              color: Colors.yellow,
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
                   ],
                 ),
               ),

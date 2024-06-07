@@ -22,6 +22,15 @@ class _Peran extends State<Peran> {
           backgroundColor: themeProvider.enableDarkMode
               ? Colors.grey.shade900
               : Colors.white,
+          leading: IconButton(
+            icon: Icon(
+              Icons.arrow_back_ios,
+              color: Colors.red,
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
           title: Image.asset(
             'assets/logo.png',
             width: 250,

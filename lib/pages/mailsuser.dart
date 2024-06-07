@@ -1,16 +1,17 @@
 // ignore_for_file: prefer_const_constructors, use_key_in_widget_constructors, library_private_types_in_public_api, prefer_final_fields, prefer_const_literals_to_create_immutables, use_super_parameters
 
 import 'package:flutter/material.dart';
+import 'dart:io';
 import 'package:provider/provider.dart';
 import 'package:triumph2/provider/theme.dart';
 import 'package:triumph2/provider/mailprovider.dart';
 
-class Berstatus extends StatefulWidget {
+class MailsUser extends StatefulWidget {
   @override
-  _Berstatus createState() => _Berstatus();
+  _MailsUser createState() => _MailsUser();
 }
 
-class _Berstatus extends State<Berstatus> {
+class _MailsUser extends State<MailsUser> {
   late List<MailItem> _filteredmailss;
   late String _selectedFilter;
   late String _searchQuery;
@@ -27,18 +28,21 @@ class _Berstatus extends State<Berstatus> {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final ThemeData themeData = themeProvider.getCurrentTheme();
     final Color textColor = themeData.textTheme.bodyLarge!.color!;
+    final Color bottomNavBarColor =
+        themeProvider.enableDarkMode ? Colors.grey.shade900 : Colors.white;
     final Color chipBackgroundColor = themeProvider.enableDarkMode
         ? Colors.grey.shade700
         : Colors.grey.shade300;
     final Color chipSelectedColor = themeProvider.enableDarkMode
         ? Colors.red.shade800
         : Colors.red.shade400;
-    final Color chipLabelColor =
-        themeProvider.enableDarkMode ? Colors.white : Colors.black;
-
+    final Color cardColor =
+        themeProvider.enableDarkMode ? Colors.grey.shade800 : Colors.white;
     final mailProvider = Provider.of<MailProvider>(context);
     _filteredmailss = _getFilteredMails(mailProvider.mailss);
-
+    final pendingMails = _filteredmailss
+        .where((mail) => mail.status == MailStatus.pending)
+        .toList();
     final approvedMails = _filteredmailss
         .where((mail) => mail.status == MailStatus.approved)
         .toList();
@@ -94,37 +98,32 @@ class _Berstatus extends State<Berstatus> {
         child: Stack(
           children: [
             Padding(
-              padding: const EdgeInsets.only(top: 110.0),
+              padding: const EdgeInsets.only(top: 120.0),
               child: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Approved / Not Mails',
+                      'Surat Masuk',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                         color: textColor,
                       ),
                     ),
-                    ListView.builder(
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                      itemCount: approvedMails.length + notApprovedMails.length,
-                      itemBuilder: (context, index) {
-                        if (index < approvedMails.length) {
-                          return _buildMailCard(approvedMails[index], textColor,
-                              themeProvider, mailProvider);
-                        } else {
-                          final notApprovedIndex = index - approvedMails.length;
-                          return _buildMailCard(
-                              notApprovedMails[notApprovedIndex],
-                              textColor,
-                              themeProvider,
-                              mailProvider);
-                        }
-                      },
+                    _buildExpansionPanelList(approvedMails + notApprovedMails,
+                        textColor, cardColor, mailProvider),
+                    SizedBox(height: 20),
+                    Text(
+                      'Surat Keluar',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: textColor,
+                      ),
                     ),
+                    _buildExpansionPanelList(
+                        pendingMails, textColor, cardColor, mailProvider),
                   ],
                 ),
               ),
@@ -157,14 +156,14 @@ class _Berstatus extends State<Berstatus> {
                   Wrap(
                     spacing: 8.0,
                     children: [
-                      _buildFilterChip('All', chipLabelColor,
+                      _buildFilterChip('All', textColor, chipBackgroundColor,
+                          chipSelectedColor),
+                      _buildFilterChip('Personal', textColor,
                           chipBackgroundColor, chipSelectedColor),
-                      _buildFilterChip('Personal', chipLabelColor,
-                          chipBackgroundColor, chipSelectedColor),
-                      _buildFilterChip('Work', chipLabelColor,
-                          chipBackgroundColor, chipSelectedColor),
-                      _buildFilterChip('Others', chipLabelColor,
-                          chipBackgroundColor, chipSelectedColor),
+                      _buildFilterChip('Work', textColor, chipBackgroundColor,
+                          chipSelectedColor),
+                      _buildFilterChip('Others', textColor, chipBackgroundColor,
+                          chipSelectedColor),
                     ],
                   ),
                   SizedBox(height: 10),
@@ -173,6 +172,33 @@ class _Berstatus extends State<Berstatus> {
             ),
           ],
         ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: bottomNavBarColor,
+        selectedItemColor: Colors.red,
+        unselectedItemColor: textColor,
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.mail),
+            label: 'Mails',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.edit_document),
+            label: 'Create Mail',
+          ),
+        ],
+        onTap: (int index) {
+          if (index == 1) {
+            Navigator.pushNamed(context, '/homeuser');
+          }
+          if (index == 2) {
+            Navigator.pushNamed(context, '/create');
+          }
+        },
       ),
     );
   }
@@ -187,20 +213,22 @@ class _Berstatus extends State<Berstatus> {
     }).toList();
   }
 
-  Widget _buildMailCard(MailItem mail, Color textColor,
-      ThemeProvider themeProvider, MailProvider mailProvider) {
-    return Card(
-      margin: EdgeInsets.symmetric(vertical: 10),
-      color: themeProvider.enableDarkMode ? Colors.grey.shade700 : Colors.white,
-      child: Padding(
-        padding: EdgeInsets.all(15),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
+  Widget _buildExpansionPanelList(List<MailItem> mailsList, Color textColor,
+      Color cardColor, MailProvider mailProvider) {
+    return ExpansionPanelList(
+      expansionCallback: (int index, bool isExpanded) {
+        setState(() {
+          mailProvider.toggleMailExpansion(mailsList[index].nama);
+        });
+      },
+      children: mailsList.map<ExpansionPanel>((MailItem mail) {
+        return ExpansionPanel(
+          backgroundColor: cardColor,
+          headerBuilder: (BuildContext context, bool isExpanded) {
+            return Container(
+              color: cardColor,
+              child: ListTile(
+                title: Text(
                   mail.nama,
                   style: TextStyle(
                     color: textColor,
@@ -208,68 +236,107 @@ class _Berstatus extends State<Berstatus> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                Row(
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(
-                      Icons.circle,
-                      color: mail.status == MailStatus.pending
-                          ? Colors.grey
-                          : mail.status == MailStatus.approved
-                              ? Colors.green
-                              : Colors.red,
-                      size: 12,
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.circle,
+                          color: mail.status == MailStatus.pending
+                              ? Colors.grey
+                              : mail.status == MailStatus.approved
+                                  ? Colors.green
+                                  : Colors.red,
+                          size: 12,
+                        ),
+                        SizedBox(width: 5),
+                        Text(
+                          mail.status == MailStatus.pending
+                              ? 'Pending'
+                              : mail.status == MailStatus.approved
+                                  ? 'Approved'
+                                  : 'Not Approved',
+                          style: TextStyle(color: textColor),
+                        ),
+                      ],
                     ),
-                    SizedBox(width: 5),
                     Text(
-                      mail.status == MailStatus.pending
-                          ? 'Pending'
-                          : mail.status == MailStatus.approved
-                              ? 'Approved'
-                              : 'Not Approved',
+                      'Isi: ${mail.isi}',
                       style: TextStyle(color: textColor),
+                    ),
+                    Text(
+                      'Kategori: ${mail.kategori}',
+                      style: TextStyle(color: textColor),
+                    ),
+                    if (mail.status == MailStatus.notApproved &&
+                        mail.alasan != null)
+                      Text(
+                        'Alasan: ${mail.alasan}',
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    if (mail.status == MailStatus.notApproved &&
+                        mail.alasan == null)
+                      Text(
+                        'Surat tidak disetujui tanpa alasan.',
+                        style: TextStyle(color: Colors.red),
+                      ),
+                  ],
+                ),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        Icons.delete,
+                        color: Colors.red,
+                      ),
+                      onPressed: () {
+                        _showDeleteConfirmationDialog(
+                            context, mail.nama, mailProvider);
+                      },
                     ),
                   ],
                 ),
-              ],
-            ),
-            SizedBox(height: 5),
-            Text(
-              'Isi: ${mail.isi}',
-              style: TextStyle(color: textColor),
-            ),
-            Text(
-              'Kategori: ${mail.kategori}',
-              style: TextStyle(color: textColor),
-            ),
-            if (mail.status == MailStatus.notApproved && mail.alasan != null)
-              Text(
-                'Alasan : ${mail.alasan}',
-                style: TextStyle(color: Colors.red),
               ),
-            if (mail.status == MailStatus.notApproved && mail.alasan == null)
-              Text(
-                'Surat tidak disetujui tanpa alasan.',
-                style: TextStyle(color: Colors.red),
-              ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+            );
+          },
+          body: Container(
+            color: cardColor,
+            child: Column(
               children: [
-                IconButton(
-                  icon: Icon(
-                    Icons.delete,
-                    color: Colors.red,
-                  ),
-                  onPressed: () {
-                    _showDeleteConfirmationDialog(
-                        context, mail.nama, mailProvider);
-                  },
-                ),
+                _buildMailImage(mail),
               ],
-            )
-          ],
-        ),
-      ),
+            ),
+          ),
+          isExpanded: mail.isExpanded,
+        );
+      }).toList(),
     );
+  }
+
+  Widget _buildMailImage(MailItem mail) {
+    if (mail.imagePath != null) {
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(5, 10, 5, 10),
+        child: Image.file(
+          File(mail.imagePath!),
+          height: 500,
+          width: 500,
+          fit: BoxFit.cover,
+        ),
+      );
+    } else {
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(5, 10, 5, 10),
+        child: Image.asset(
+          'assets/surat1.png',
+          height: 500,
+          width: 500,
+          fit: BoxFit.cover,
+        ),
+      );
+    }
   }
 
   FilterChip _buildFilterChip(String label, Color chipLabelColor,

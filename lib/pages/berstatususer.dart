@@ -6,12 +6,12 @@ import 'package:provider/provider.dart';
 import 'package:triumph2/provider/theme.dart';
 import 'package:triumph2/provider/mailprovider.dart';
 
-class PendingAdmin extends StatefulWidget {
+class BerstatusUser extends StatefulWidget {
   @override
-  _PendingAdmin createState() => _PendingAdmin();
+  _BerstatusUser createState() => _BerstatusUser();
 }
 
-class _PendingAdmin extends State<PendingAdmin> {
+class _BerstatusUser extends State<BerstatusUser> {
   late List<MailItem> _filteredmailss;
   late String _selectedFilter;
   late String _searchQuery;
@@ -28,7 +28,6 @@ class _PendingAdmin extends State<PendingAdmin> {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final ThemeData themeData = themeProvider.getCurrentTheme();
     final Color textColor = themeData.textTheme.bodyLarge!.color!;
-    themeProvider.enableDarkMode ? Colors.white : Colors.black;
     final Color chipBackgroundColor = themeProvider.enableDarkMode
         ? Colors.grey.shade700
         : Colors.grey.shade300;
@@ -43,8 +42,11 @@ class _PendingAdmin extends State<PendingAdmin> {
         themeProvider.enableDarkMode ? Colors.grey.shade800 : Colors.white;
     final mailProvider = Provider.of<MailProvider>(context);
     _filteredmailss = _getFilteredMails(mailProvider.mailss);
-    final pendingMails = _filteredmailss
-        .where((mail) => mail.status == MailStatus.pending)
+    final approvedMails = _filteredmailss
+        .where((mail) => mail.status == MailStatus.approved)
+        .toList();
+    final notApprovedMails = _filteredmailss
+        .where((mail) => mail.status == MailStatus.notApproved)
         .toList();
 
     return Scaffold(
@@ -101,15 +103,15 @@ class _PendingAdmin extends State<PendingAdmin> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Pending Mails',
+                      'Approved / Not Mails',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                         color: textColor,
                       ),
                     ),
-                    _buildExpansionPanelList(
-                        pendingMails, textColor, cardColor, mailProvider),
+                    _buildExpansionPanelList(approvedMails + notApprovedMails,
+                        textColor, cardColor, mailProvider),
                   ],
                 ),
               ),
@@ -179,7 +181,7 @@ class _PendingAdmin extends State<PendingAdmin> {
         ],
         onTap: (int index) {
           if (index == 1) {
-            Navigator.pushNamed(context, '/homeadmin');
+            Navigator.pushNamed(context, '/homeuser');
           }
           if (index == 2) {
             Navigator.pushNamed(context, '/create');
@@ -272,27 +274,6 @@ class _PendingAdmin extends State<PendingAdmin> {
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (mail.status == MailStatus.pending)
-                      IconButton(
-                        icon: Icon(
-                          Icons.check,
-                          color: Colors.green,
-                        ),
-                        onPressed: () {
-                          mailProvider.changeMailStatus(
-                              mail.nama, MailStatus.approved);
-                        },
-                      ),
-                    if (mail.status == MailStatus.pending)
-                      IconButton(
-                        icon: Icon(
-                          Icons.clear,
-                          color: Colors.red,
-                        ),
-                        onPressed: () {
-                          _showNotApprovedDialog(context, mail, mailProvider);
-                        },
-                      ),
                     IconButton(
                       icon: Icon(
                         Icons.delete,
@@ -344,40 +325,6 @@ class _PendingAdmin extends State<PendingAdmin> {
         ),
       );
     }
-  }
-
-  void _showNotApprovedDialog(
-      BuildContext context, MailItem mail, MailProvider mailProvider) {
-    TextEditingController _alasanController = TextEditingController();
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Alasan Tidak Disetujui'),
-          content: TextField(
-            controller: _alasanController,
-            decoration: InputDecoration(labelText: 'Alasan'),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Batal'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: Text('Simpan'),
-              onPressed: () {
-                String alasan = _alasanController.text;
-                mailProvider.changeMailStatus(mail.nama, MailStatus.notApproved,
-                    alasan: alasan);
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
   }
 
   FilterChip _buildFilterChip(String label, Color chipLabelColor,

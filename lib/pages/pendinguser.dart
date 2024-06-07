@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors, use_key_in_widget_constructors, library_private_types_in_public_api, prefer_final_fields, prefer_const_literals_to_create_immutables, use_super_parameters
 
 import 'package:flutter/material.dart';
+import 'dart:io';
 import 'package:provider/provider.dart';
 import 'package:triumph2/provider/theme.dart';
 import 'package:triumph2/provider/mailprovider.dart';
@@ -36,10 +37,12 @@ class _PendingUser extends State<PendingUser> {
         : Colors.red.shade400;
     final Color chipLabelColor =
         themeProvider.enableDarkMode ? Colors.white : Colors.black;
-
+    final Color bottomNavBarColor =
+        themeProvider.enableDarkMode ? Colors.grey.shade900 : Colors.white;
+    final Color cardColor =
+        themeProvider.enableDarkMode ? Colors.grey.shade800 : Colors.white;
     final mailProvider = Provider.of<MailProvider>(context);
     _filteredmailss = _getFilteredMails(mailProvider.mailss);
-
     final pendingMails = _filteredmailss
         .where((mail) => mail.status == MailStatus.pending)
         .toList();
@@ -92,7 +95,7 @@ class _PendingUser extends State<PendingUser> {
         child: Stack(
           children: [
             Padding(
-              padding: const EdgeInsets.only(top: 110.0),
+              padding: const EdgeInsets.only(top: 120.0),
               child: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -105,16 +108,8 @@ class _PendingUser extends State<PendingUser> {
                         color: textColor,
                       ),
                     ),
-                    ListView.builder(
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                      itemCount: pendingMails.length,
-                      itemBuilder: (context, index) {
-                        final mails = pendingMails[index];
-                        return _buildMailCard(
-                            mails, textColor, themeProvider, mailProvider);
-                      },
-                    ),
+                    _buildExpansionPanelList(
+                        pendingMails, textColor, cardColor, mailProvider),
                   ],
                 ),
               ),
@@ -164,6 +159,33 @@ class _PendingUser extends State<PendingUser> {
           ],
         ),
       ),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: bottomNavBarColor,
+        selectedItemColor: Colors.red,
+        unselectedItemColor: textColor,
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.outbox),
+            label: 'Outbox',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.edit_document),
+            label: 'Create Mail',
+          ),
+        ],
+        onTap: (int index) {
+          if (index == 1) {
+            Navigator.pushNamed(context, '/homeuser');
+          }
+          if (index == 2) {
+            Navigator.pushNamed(context, '/create');
+          }
+        },
+      ),
     );
   }
 
@@ -177,20 +199,22 @@ class _PendingUser extends State<PendingUser> {
     }).toList();
   }
 
-  Widget _buildMailCard(MailItem mail, Color textColor,
-      ThemeProvider themeProvider, MailProvider mailProvider) {
-    return Card(
-      margin: EdgeInsets.symmetric(vertical: 10),
-      color: themeProvider.enableDarkMode ? Colors.grey.shade700 : Colors.white,
-      child: Padding(
-        padding: EdgeInsets.all(15),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
+  Widget _buildExpansionPanelList(List<MailItem> mailsList, Color textColor,
+      Color cardColor, MailProvider mailProvider) {
+    return ExpansionPanelList(
+      expansionCallback: (int index, bool isExpanded) {
+        setState(() {
+          mailProvider.toggleMailExpansion(mailsList[index].nama);
+        });
+      },
+      children: mailsList.map<ExpansionPanel>((MailItem mail) {
+        return ExpansionPanel(
+          backgroundColor: cardColor,
+          headerBuilder: (BuildContext context, bool isExpanded) {
+            return Container(
+              color: cardColor,
+              child: ListTile(
+                title: Text(
                   mail.nama,
                   style: TextStyle(
                     color: textColor,
@@ -198,68 +222,107 @@ class _PendingUser extends State<PendingUser> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                Row(
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(
-                      Icons.circle,
-                      color: mail.status == MailStatus.pending
-                          ? Colors.grey
-                          : mail.status == MailStatus.approved
-                              ? Colors.green
-                              : Colors.red,
-                      size: 12,
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.circle,
+                          color: mail.status == MailStatus.pending
+                              ? Colors.grey
+                              : mail.status == MailStatus.approved
+                                  ? Colors.green
+                                  : Colors.red,
+                          size: 12,
+                        ),
+                        SizedBox(width: 5),
+                        Text(
+                          mail.status == MailStatus.pending
+                              ? 'Pending'
+                              : mail.status == MailStatus.approved
+                                  ? 'Approved'
+                                  : 'Not Approved',
+                          style: TextStyle(color: textColor),
+                        ),
+                      ],
                     ),
-                    SizedBox(width: 5),
                     Text(
-                      mail.status == MailStatus.pending
-                          ? 'Pending'
-                          : mail.status == MailStatus.approved
-                              ? 'Approved'
-                              : 'Not Approved',
+                      'Isi: ${mail.isi}',
                       style: TextStyle(color: textColor),
+                    ),
+                    Text(
+                      'Kategori: ${mail.kategori}',
+                      style: TextStyle(color: textColor),
+                    ),
+                    if (mail.status == MailStatus.notApproved &&
+                        mail.alasan != null)
+                      Text(
+                        'Alasan: ${mail.alasan}',
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    if (mail.status == MailStatus.notApproved &&
+                        mail.alasan == null)
+                      Text(
+                        'Surat tidak disetujui tanpa alasan.',
+                        style: TextStyle(color: Colors.red),
+                      ),
+                  ],
+                ),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        Icons.delete,
+                        color: Colors.red,
+                      ),
+                      onPressed: () {
+                        _showDeleteConfirmationDialog(
+                            context, mail.nama, mailProvider);
+                      },
                     ),
                   ],
                 ),
-              ],
-            ),
-            SizedBox(height: 5),
-            Text(
-              'Isi: ${mail.isi}',
-              style: TextStyle(color: textColor),
-            ),
-            Text(
-              'Kategori: ${mail.kategori}',
-              style: TextStyle(color: textColor),
-            ),
-            if (mail.status == MailStatus.notApproved && mail.alasan != null)
-              Text(
-                'Alasan : ${mail.alasan}',
-                style: TextStyle(color: Colors.red),
               ),
-            if (mail.status == MailStatus.notApproved && mail.alasan == null)
-              Text(
-                'Surat tidak disetujui tanpa alasan.',
-                style: TextStyle(color: Colors.red),
-              ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+            );
+          },
+          body: Container(
+            color: cardColor,
+            child: Column(
               children: [
-                IconButton(
-                  icon: Icon(
-                    Icons.delete,
-                    color: Colors.red,
-                  ),
-                  onPressed: () {
-                    _showDeleteConfirmationDialog(
-                        context, mail.nama, mailProvider);
-                  },
-                ),
+                _buildMailImage(mail),
               ],
-            )
-          ],
-        ),
-      ),
+            ),
+          ),
+          isExpanded: mail.isExpanded,
+        );
+      }).toList(),
     );
+  }
+
+  Widget _buildMailImage(MailItem mail) {
+    if (mail.imagePath != null) {
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(5, 10, 5, 10),
+        child: Image.file(
+          File(mail.imagePath!),
+          height: 500,
+          width: 500,
+          fit: BoxFit.cover,
+        ),
+      );
+    } else {
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(5, 10, 5, 10),
+        child: Image.asset(
+          'assets/surat1.png',
+          height: 500,
+          width: 500,
+          fit: BoxFit.cover,
+        ),
+      );
+    }
   }
 
   FilterChip _buildFilterChip(String label, Color chipLabelColor,
