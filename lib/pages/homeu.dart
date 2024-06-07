@@ -343,10 +343,17 @@ class _HomeU extends State<HomeU> {
             icon: Icon(Icons.edit_document),
             label: 'Create Mail',
           ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.mail),
+            label: 'Mails',
+          ),
         ],
         onTap: (int index) {
           if (index == 1) {
             Navigator.pushNamed(context, '/create');
+          }
+          if (index == 2) {
+            Navigator.pushNamed(context, '/mailsuser');
           }
         },
       ),
