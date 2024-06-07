@@ -6,12 +6,12 @@ import 'package:provider/provider.dart';
 import 'package:triumph2/provider/theme.dart';
 import 'package:triumph2/provider/mailprovider.dart';
 
-class PendingUser extends StatefulWidget {
+class OutboxUser extends StatefulWidget {
   @override
-  _PendingUser createState() => _PendingUser();
+  _OutboxUser createState() => _OutboxUser();
 }
 
-class _PendingUser extends State<PendingUser> {
+class _OutboxUser extends State<OutboxUser> {
   late List<MailItem> _filteredmailss;
   late String _selectedFilter;
   late String _searchQuery;

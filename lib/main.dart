@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:triumph2/pages/berstatusadmin.dart';
-import 'package:triumph2/pages/berstatususer.dart';
+import 'package:triumph2/pages/outboxadmin.dart';
+import 'package:triumph2/pages/inboxuser.dart';
 import 'package:triumph2/pages/editprofile.dart';
 import 'package:triumph2/pages/homea.dart';
 import 'package:triumph2/pages/homeu.dart';
 import 'package:triumph2/pages/mailsadmin.dart';
 import 'package:triumph2/pages/loginadmin.dart';
-import 'package:triumph2/pages/pendingadmin.dart';
-import 'package:triumph2/pages/pendinguser.dart';
+import 'package:triumph2/pages/inboxadmin.dart';
+import 'package:triumph2/pages/outboxuser.dart';
 import 'package:triumph2/pages/peran.dart';
 import 'package:triumph2/pages/profile.dart';
 import 'package:triumph2/pages/landing.dart';
@@ -57,10 +57,10 @@ class MyApp extends StatelessWidget {
         '/create': (context) => CreateMail(),
         '/profile': (context) => Profile(),
         '/editprofile': (context) => EditProfile(),
-        '/pendinguser': (context) => PendingUser(),
-        '/pendingadmin': (context) => PendingAdmin(),
-        '/berstatusadmin': (context) => BerstatusAdmin(),
-        '/berstatususer': (context) => BerstatusUser(),
+        '/pendinguser': (context) => OutboxUser(),
+        '/pendingadmin': (context) => InboxAdmin(),
+        '/berstatusadmin': (context) => OutboxAdmin(),
+        '/berstatususer': (context) => InboxUser(),
       },
     );
   }

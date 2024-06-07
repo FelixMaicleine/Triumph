@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, use_key_in_widget_constructors, library_private_types_in_public_api, prefer_final_fields, prefer_const_literals_to_create_immutables, use_super_parameters, no_leading_underscores_for_local_identifiers
+// ignore_for_file: prefer_const_constructors, use_key_in_widget_constructors, library_private_types_in_public_api, prefer_final_fields, prefer_const_literals_to_create_immutables, use_super_parameters
 
 import 'package:flutter/material.dart';
 import 'dart:io';
@@ -6,12 +6,12 @@ import 'package:provider/provider.dart';
 import 'package:triumph2/provider/theme.dart';
 import 'package:triumph2/provider/mailprovider.dart';
 
-class BerstatusAdmin extends StatefulWidget {
+class InboxUser extends StatefulWidget {
   @override
-  _BerstatusAdmin createState() => _BerstatusAdmin();
+  _InboxUser createState() => _InboxUser();
 }
 
-class _BerstatusAdmin extends State<BerstatusAdmin> {
+class _InboxUser extends State<InboxUser> {
   late List<MailItem> _filteredmailss;
   late String _selectedFilter;
   late String _searchQuery;
@@ -167,8 +167,8 @@ class _BerstatusAdmin extends State<BerstatusAdmin> {
         unselectedItemColor: textColor,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.outbox),
-            label: 'Outbox',
+            icon: Icon(Icons.archive),
+            label: 'Inbox',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
@@ -181,7 +181,7 @@ class _BerstatusAdmin extends State<BerstatusAdmin> {
         ],
         onTap: (int index) {
           if (index == 1) {
-            Navigator.pushNamed(context, '/homeadmin');
+            Navigator.pushNamed(context, '/homeuser');
           }
           if (index == 2) {
             Navigator.pushNamed(context, '/create');
@@ -274,27 +274,6 @@ class _BerstatusAdmin extends State<BerstatusAdmin> {
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (mail.status == MailStatus.pending)
-                      IconButton(
-                        icon: Icon(
-                          Icons.check,
-                          color: Colors.green,
-                        ),
-                        onPressed: () {
-                          mailProvider.changeMailStatus(
-                              mail.nama, MailStatus.approved);
-                        },
-                      ),
-                    if (mail.status == MailStatus.pending)
-                      IconButton(
-                        icon: Icon(
-                          Icons.clear,
-                          color: Colors.red,
-                        ),
-                        onPressed: () {
-                          _showNotApprovedDialog(context, mail, mailProvider);
-                        },
-                      ),
                     IconButton(
                       icon: Icon(
                         Icons.delete,
@@ -360,41 +339,6 @@ class _BerstatusAdmin extends State<BerstatusAdmin> {
         setState(() {
           _selectedFilter = label;
         });
-      },
-    );
-  }
-
-  void _showNotApprovedDialog(
-      BuildContext context, MailItem mail, MailProvider mailProvider) {
-    TextEditingController _reasonController = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Alasan tidak disetujui'),
-          content: TextField(
-            controller: _reasonController,
-            decoration: InputDecoration(hintText: 'Masukkan alasan'),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Batal'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: Text('Kirim'),
-              onPressed: () {
-                String reason = _reasonController.text.trim();
-                mailProvider.changeMailStatus(mail.nama, MailStatus.notApproved,
-                    alasan: reason);
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
       },
     );
   }

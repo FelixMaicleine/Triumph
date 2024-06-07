@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, use_key_in_widget_constructors, library_private_types_in_public_api, prefer_final_fields, prefer_const_literals_to_create_immutables, use_super_parameters
+// ignore_for_file: prefer_const_constructors, use_key_in_widget_constructors, library_private_types_in_public_api, prefer_final_fields, prefer_const_literals_to_create_immutables, use_super_parameters, no_leading_underscores_for_local_identifiers
 
 import 'package:flutter/material.dart';
 import 'dart:io';
@@ -6,12 +6,12 @@ import 'package:provider/provider.dart';
 import 'package:triumph2/provider/theme.dart';
 import 'package:triumph2/provider/mailprovider.dart';
 
-class PendingAdmin extends StatefulWidget {
+class OutboxAdmin extends StatefulWidget {
   @override
-  _PendingAdmin createState() => _PendingAdmin();
+  _OutboxAdmin createState() => _OutboxAdmin();
 }
 
-class _PendingAdmin extends State<PendingAdmin> {
+class _OutboxAdmin extends State<OutboxAdmin> {
   late List<MailItem> _filteredmailss;
   late String _selectedFilter;
   late String _searchQuery;
@@ -28,7 +28,6 @@ class _PendingAdmin extends State<PendingAdmin> {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final ThemeData themeData = themeProvider.getCurrentTheme();
     final Color textColor = themeData.textTheme.bodyLarge!.color!;
-    themeProvider.enableDarkMode ? Colors.white : Colors.black;
     final Color chipBackgroundColor = themeProvider.enableDarkMode
         ? Colors.grey.shade700
         : Colors.grey.shade300;
@@ -43,8 +42,11 @@ class _PendingAdmin extends State<PendingAdmin> {
         themeProvider.enableDarkMode ? Colors.grey.shade800 : Colors.white;
     final mailProvider = Provider.of<MailProvider>(context);
     _filteredmailss = _getFilteredMails(mailProvider.mailss);
-    final pendingMails = _filteredmailss
-        .where((mail) => mail.status == MailStatus.pending)
+    final approvedMails = _filteredmailss
+        .where((mail) => mail.status == MailStatus.approved)
+        .toList();
+    final notApprovedMails = _filteredmailss
+        .where((mail) => mail.status == MailStatus.notApproved)
         .toList();
 
     return Scaffold(
@@ -101,15 +103,15 @@ class _PendingAdmin extends State<PendingAdmin> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Pending Mails',
+                      'Approved / Not Mails',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                         color: textColor,
                       ),
                     ),
-                    _buildExpansionPanelList(
-                        pendingMails, textColor, cardColor, mailProvider),
+                    _buildExpansionPanelList(approvedMails + notApprovedMails,
+                        textColor, cardColor, mailProvider),
                   ],
                 ),
               ),
@@ -165,8 +167,8 @@ class _PendingAdmin extends State<PendingAdmin> {
         unselectedItemColor: textColor,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.archive),
-            label: 'Inbox',
+            icon: Icon(Icons.outbox),
+            label: 'Outbox',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
@@ -346,40 +348,6 @@ class _PendingAdmin extends State<PendingAdmin> {
     }
   }
 
-  void _showNotApprovedDialog(
-      BuildContext context, MailItem mail, MailProvider mailProvider) {
-    TextEditingController _alasanController = TextEditingController();
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Alasan Tidak Disetujui'),
-          content: TextField(
-            controller: _alasanController,
-            decoration: InputDecoration(labelText: 'Alasan'),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Batal'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: Text('Simpan'),
-              onPressed: () {
-                String alasan = _alasanController.text;
-                mailProvider.changeMailStatus(mail.nama, MailStatus.notApproved,
-                    alasan: alasan);
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   FilterChip _buildFilterChip(String label, Color chipLabelColor,
       Color chipBackgroundColor, Color chipSelectedColor) {
     return FilterChip(
@@ -392,6 +360,41 @@ class _PendingAdmin extends State<PendingAdmin> {
         setState(() {
           _selectedFilter = label;
         });
+      },
+    );
+  }
+
+  void _showNotApprovedDialog(
+      BuildContext context, MailItem mail, MailProvider mailProvider) {
+    TextEditingController _reasonController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Alasan tidak disetujui'),
+          content: TextField(
+            controller: _reasonController,
+            decoration: InputDecoration(hintText: 'Masukkan alasan'),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Batal'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Kirim'),
+              onPressed: () {
+                String reason = _reasonController.text.trim();
+                mailProvider.changeMailStatus(mail.nama, MailStatus.notApproved,
+                    alasan: reason);
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
       },
     );
   }
