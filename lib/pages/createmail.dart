@@ -29,6 +29,15 @@ class _CreateMailState extends State<CreateMail> {
     }
   }
 
+  void _showSnackBar(BuildContext context) {
+    final snackBar = SnackBar(
+      content: Text('The mail was saved successfully!'),
+      backgroundColor: Colors.green,
+      duration: Duration(seconds: 1),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
@@ -242,6 +251,7 @@ class _CreateMailState extends State<CreateMail> {
                             newMail.imagePath = _selectedImage!.path;
                           }
                           mailProvider.addMail(newMail);
+                          _showSnackBar(context);
                           Navigator.pop(context);
                         },
                         style: ElevatedButton.styleFrom(

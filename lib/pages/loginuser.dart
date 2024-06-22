@@ -12,6 +12,15 @@ class LoginUser extends StatefulWidget {
 }
 
 class _LoginUser extends State<LoginUser> {
+  void _showSnackBar(BuildContext context) {
+    final snackBar = SnackBar(
+      content: Text('You must agree to the terms of service!'),
+      backgroundColor: Colors.red,
+      duration: Duration(seconds: 1),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   final TextEditingController _usernameController = TextEditingController();
 
   Map<String, String>? _message;
@@ -227,15 +236,17 @@ class _LoginUser extends State<LoginUser> {
                 ],
               ),
               ElevatedButton(
-                onPressed: _agreedToTerms
-                    ? () {
-                        Navigator.pushNamedAndRemoveUntil(
-                          context,
-                          '/homeuser',
-                          ModalRoute.withName('/'),
-                        );
-                      }
-                    : null,
+                onPressed: () {
+                  if (_agreedToTerms) {
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      '/homeuser',
+                      ModalRoute.withName('/'),
+                    );
+                  } else {
+                    _showSnackBar(context); // Call the function directly
+                  }
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,
                   minimumSize: Size(200, 50),

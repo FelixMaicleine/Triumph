@@ -34,8 +34,6 @@ class _InboxUser extends State<InboxUser> {
     final Color chipSelectedColor = themeProvider.enableDarkMode
         ? Colors.red.shade800
         : Colors.red.shade400;
-    final Color chipLabelColor =
-        themeProvider.enableDarkMode ? Colors.white : Colors.black;
     final Color bottomNavBarColor =
         themeProvider.enableDarkMode ? Colors.grey.shade900 : Colors.white;
     final Color cardColor =
@@ -103,7 +101,7 @@ class _InboxUser extends State<InboxUser> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Approved / Not Mails',
+                      'Inbox',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -141,17 +139,38 @@ class _InboxUser extends State<InboxUser> {
                     },
                   ),
                   SizedBox(height: 15),
-                  Wrap(
-                    spacing: 8.0,
+                  Row(
                     children: [
-                      _buildFilterChip('All', chipLabelColor,
-                          chipBackgroundColor, chipSelectedColor),
-                      _buildFilterChip('Personal', chipLabelColor,
-                          chipBackgroundColor, chipSelectedColor),
-                      _buildFilterChip('Work', chipLabelColor,
-                          chipBackgroundColor, chipSelectedColor),
-                      _buildFilterChip('Others', chipLabelColor,
-                          chipBackgroundColor, chipSelectedColor),
+                      IconButton(
+                        icon: Icon(
+                          _selectedFilter == 'Starred'
+                              ? Icons.star
+                              : Icons.star_border,
+                          color: _selectedFilter == 'Starred'
+                              ? Colors.yellow
+                              : textColor,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _selectedFilter = _selectedFilter == 'Starred'
+                                ? 'All'
+                                : 'Starred';
+                          });
+                        },
+                      ),
+                      Wrap(
+                        spacing: 5.0,
+                        children: [
+                          _buildFilterChip('All', textColor,
+                              chipBackgroundColor, chipSelectedColor),
+                          _buildFilterChip('Personal', textColor,
+                              chipBackgroundColor, chipSelectedColor),
+                          _buildFilterChip('Work', textColor,
+                              chipBackgroundColor, chipSelectedColor),
+                          _buildFilterChip('Others', textColor,
+                              chipBackgroundColor, chipSelectedColor),
+                        ],
+                      ),
                     ],
                   ),
                   SizedBox(height: 10),
@@ -193,8 +212,11 @@ class _InboxUser extends State<InboxUser> {
 
   List<MailItem> _getFilteredMails(List<MailItem> mailss) {
     return mailss.where((mails) {
-      final matchesFilter =
-          _selectedFilter == 'All' || mails.kategori == _selectedFilter;
+      final matchesFilter = _selectedFilter == 'All'
+          ? true
+          : _selectedFilter == 'Starred'
+              ? mails.isStarred
+              : mails.kategori == _selectedFilter;
       final matchesSearch =
           mails.nama.toLowerCase().contains(_searchQuery.toLowerCase());
       return matchesFilter && matchesSearch;
@@ -216,13 +238,53 @@ class _InboxUser extends State<InboxUser> {
             return Container(
               color: cardColor,
               child: ListTile(
-                title: Text(
-                  mail.nama,
-                  style: TextStyle(
-                    color: textColor,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                title: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            IconButton(
+                              icon: Icon(
+                                mail.isStarred ? Icons.star : Icons.star_border,
+                                color:
+                                    mail.isStarred ? Colors.yellow : textColor,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  mailProvider.toggleMailStar(mail.nama);
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                        IconButton(
+                          icon: Icon(
+                            Icons.delete,
+                            color: Colors.red,
+                          ),
+                          onPressed: () {
+                            _showDeleteConfirmationDialog(
+                                context, mail.nama, mailProvider);
+                          },
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          mail.nama,
+                          style: TextStyle(
+                            color: textColor,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    )
+                  ],
                 ),
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -252,38 +314,27 @@ class _InboxUser extends State<InboxUser> {
                     Text(
                       'Isi: ${mail.isi}',
                       style: TextStyle(color: textColor),
+                      overflow: TextOverflow.ellipsis,
                     ),
                     Text(
                       'Kategori: ${mail.kategori}',
                       style: TextStyle(color: textColor),
+                      overflow: TextOverflow.ellipsis,
                     ),
                     if (mail.status == MailStatus.notApproved &&
                         mail.alasan != null)
                       Text(
                         'Alasan: ${mail.alasan}',
                         style: TextStyle(color: Colors.red),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     if (mail.status == MailStatus.notApproved &&
                         mail.alasan == null)
                       Text(
                         'Surat tidak disetujui tanpa alasan.',
                         style: TextStyle(color: Colors.red),
+                        overflow: TextOverflow.ellipsis,
                       ),
-                  ],
-                ),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      icon: Icon(
-                        Icons.delete,
-                        color: Colors.red,
-                      ),
-                      onPressed: () {
-                        _showDeleteConfirmationDialog(
-                            context, mail.nama, mailProvider);
-                      },
-                    ),
                   ],
                 ),
               ),

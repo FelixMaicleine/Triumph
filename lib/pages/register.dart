@@ -12,6 +12,16 @@ class Register extends StatefulWidget {
 }
 
 class _Register extends State<Register> {
+  void _showSnackBar(BuildContext context) {
+    final snackBar = SnackBar(
+      content:
+          Text('You must fill your email, passwords and the terms of service!'),
+      backgroundColor: Colors.red,
+      duration: Duration(seconds: 2),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   String _selectedGender = 'Not Telling';
   final List<String> _genders = ['Not Telling', 'Male', 'Female'];
   IconData _selectedIcon = Icons.person;
@@ -499,11 +509,13 @@ class _Register extends State<Register> {
                       height: 10,
                     ),
                     ElevatedButton(
-                      onPressed: _isButtonEnabled
-                          ? () {
-                              _handleRegister();
-                            }
-                          : null,
+                      onPressed: () {
+                        if (_isButtonEnabled) {
+                          _handleRegister();
+                        } else {
+                          _showSnackBar(context); // Call the function directly
+                        }
+                      },
                       style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.red,
                           minimumSize: Size(200, 50)),

@@ -153,17 +153,38 @@ class _MailsUser extends State<MailsUser> {
                     },
                   ),
                   SizedBox(height: 15),
-                  Wrap(
-                    spacing: 8.0,
+                  Row(
                     children: [
-                      _buildFilterChip('All', textColor, chipBackgroundColor,
-                          chipSelectedColor),
-                      _buildFilterChip('Personal', textColor,
-                          chipBackgroundColor, chipSelectedColor),
-                      _buildFilterChip('Work', textColor, chipBackgroundColor,
-                          chipSelectedColor),
-                      _buildFilterChip('Others', textColor, chipBackgroundColor,
-                          chipSelectedColor),
+                      IconButton(
+                        icon: Icon(
+                          _selectedFilter == 'Starred'
+                              ? Icons.star
+                              : Icons.star_border,
+                          color: _selectedFilter == 'Starred'
+                              ? Colors.yellow
+                              : textColor,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _selectedFilter = _selectedFilter == 'Starred'
+                                ? 'All'
+                                : 'Starred';
+                          });
+                        },
+                      ),
+                      Wrap(
+                        spacing: 5.0,
+                        children: [
+                          _buildFilterChip('All', textColor,
+                              chipBackgroundColor, chipSelectedColor),
+                          _buildFilterChip('Personal', textColor,
+                              chipBackgroundColor, chipSelectedColor),
+                          _buildFilterChip('Work', textColor,
+                              chipBackgroundColor, chipSelectedColor),
+                          _buildFilterChip('Others', textColor,
+                              chipBackgroundColor, chipSelectedColor),
+                        ],
+                      ),
                     ],
                   ),
                   SizedBox(height: 10),
@@ -205,8 +226,11 @@ class _MailsUser extends State<MailsUser> {
 
   List<MailItem> _getFilteredMails(List<MailItem> mailss) {
     return mailss.where((mails) {
-      final matchesFilter =
-          _selectedFilter == 'All' || mails.kategori == _selectedFilter;
+      final matchesFilter = _selectedFilter == 'All'
+          ? true
+          : _selectedFilter == 'Starred'
+              ? mails.isStarred
+              : mails.kategori == _selectedFilter;
       final matchesSearch =
           mails.nama.toLowerCase().contains(_searchQuery.toLowerCase());
       return matchesFilter && matchesSearch;
@@ -228,13 +252,53 @@ class _MailsUser extends State<MailsUser> {
             return Container(
               color: cardColor,
               child: ListTile(
-                title: Text(
-                  mail.nama,
-                  style: TextStyle(
-                    color: textColor,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                title: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            IconButton(
+                              icon: Icon(
+                                mail.isStarred ? Icons.star : Icons.star_border,
+                                color:
+                                    mail.isStarred ? Colors.yellow : textColor,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  mailProvider.toggleMailStar(mail.nama);
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                        IconButton(
+                          icon: Icon(
+                            Icons.delete,
+                            color: Colors.red,
+                          ),
+                          onPressed: () {
+                            _showDeleteConfirmationDialog(
+                                context, mail.nama, mailProvider);
+                          },
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          mail.nama,
+                          style: TextStyle(
+                            color: textColor,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    )
+                  ],
                 ),
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -264,38 +328,27 @@ class _MailsUser extends State<MailsUser> {
                     Text(
                       'Isi: ${mail.isi}',
                       style: TextStyle(color: textColor),
+                      overflow: TextOverflow.ellipsis,
                     ),
                     Text(
                       'Kategori: ${mail.kategori}',
                       style: TextStyle(color: textColor),
+                      overflow: TextOverflow.ellipsis,
                     ),
                     if (mail.status == MailStatus.notApproved &&
                         mail.alasan != null)
                       Text(
                         'Alasan: ${mail.alasan}',
                         style: TextStyle(color: Colors.red),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     if (mail.status == MailStatus.notApproved &&
                         mail.alasan == null)
                       Text(
                         'Surat tidak disetujui tanpa alasan.',
                         style: TextStyle(color: Colors.red),
+                        overflow: TextOverflow.ellipsis,
                       ),
-                  ],
-                ),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      icon: Icon(
-                        Icons.delete,
-                        color: Colors.red,
-                      ),
-                      onPressed: () {
-                        _showDeleteConfirmationDialog(
-                            context, mail.nama, mailProvider);
-                      },
-                    ),
                   ],
                 ),
               ),

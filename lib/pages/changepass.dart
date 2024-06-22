@@ -12,6 +12,15 @@ class ChangePass extends StatefulWidget {
 }
 
 class _ChangePass extends State<ChangePass> {
+  void _showSnackBar(BuildContext context) {
+    final snackBar = SnackBar(
+      content: Text('Please use strong password!'),
+      backgroundColor: Colors.red,
+      duration: Duration(seconds: 1),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   String _newPasswordErrorText = '';
   String _confirmPasswordErrorText = '';
   String _newPassword = '';
@@ -172,7 +181,6 @@ class _ChangePass extends State<ChangePass> {
                 ),
               ],
             ),
-            SizedBox(height: 10),
             Row(
               children: [
                 Text(
@@ -221,13 +229,15 @@ class _ChangePass extends State<ChangePass> {
                 ),
               ],
             ),
-            SizedBox(height: 30),
+            SizedBox(height: 10),
             ElevatedButton(
-              onPressed: _isButtonEnabled
-                  ? () {
-                      _handleChangePassword();
-                    }
-                  : null,
+              onPressed: () {
+                if (_isButtonEnabled) {
+                  _handleChangePassword();
+                } else {
+                  _showSnackBar(context); // Call the function directly
+                }
+              },
               style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red, minimumSize: Size(200, 50)),
               child: Text(

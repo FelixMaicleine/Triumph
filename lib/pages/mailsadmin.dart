@@ -129,47 +129,67 @@ class _MailsAdmin extends State<MailsAdmin> {
               ),
             ),
             Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  TextField(
-                    decoration: InputDecoration(
-                      prefixIcon: Icon(Icons.search, color: textColor),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: textColor),
+                top: 0,
+                left: 0,
+                right: 0,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    TextField(
+                      decoration: InputDecoration(
+                        prefixIcon: Icon(Icons.search, color: textColor),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: textColor),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: textColor),
+                        ),
                       ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: textColor),
-                      ),
+                      style: TextStyle(color: textColor),
+                      onChanged: (value) {
+                        setState(() {
+                          _searchQuery = value;
+                        });
+                      },
                     ),
-                    style: TextStyle(color: textColor),
-                    onChanged: (value) {
-                      setState(() {
-                        _searchQuery = value;
-                      });
-                    },
-                  ),
-                  SizedBox(height: 15),
-                  Wrap(
-                    spacing: 8.0,
-                    children: [
-                      _buildFilterChip('All', textColor, chipBackgroundColor,
-                          chipSelectedColor),
-                      _buildFilterChip('Personal', textColor,
-                          chipBackgroundColor, chipSelectedColor),
-                      _buildFilterChip('Work', textColor, chipBackgroundColor,
-                          chipSelectedColor),
-                      _buildFilterChip('Others', textColor, chipBackgroundColor,
-                          chipSelectedColor),
-                    ],
-                  ),
-                  SizedBox(height: 10),
-                ],
-              ),
-            ),
+                    SizedBox(height: 15),
+                    Row(
+                      children: [
+                        IconButton(
+                          icon: Icon(
+                            _selectedFilter == 'Starred'
+                                ? Icons.star
+                                : Icons.star_border,
+                            color: _selectedFilter == 'Starred'
+                                ? Colors.yellow
+                                : textColor,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _selectedFilter = _selectedFilter == 'Starred'
+                                  ? 'All'
+                                  : 'Starred';
+                            });
+                          },
+                        ),
+                        Wrap(
+                          spacing: 5.0,
+                          children: [
+                            _buildFilterChip('All', textColor,
+                                chipBackgroundColor, chipSelectedColor),
+                            _buildFilterChip('Personal', textColor,
+                                chipBackgroundColor, chipSelectedColor),
+                            _buildFilterChip('Work', textColor,
+                                chipBackgroundColor, chipSelectedColor),
+                            _buildFilterChip('Others', textColor,
+                                chipBackgroundColor, chipSelectedColor),
+                          ],
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 10),
+                  ],
+                )),
           ],
         ),
       ),
@@ -205,8 +225,11 @@ class _MailsAdmin extends State<MailsAdmin> {
 
   List<MailItem> _getFilteredMails(List<MailItem> mailss) {
     return mailss.where((mails) {
-      final matchesFilter =
-          _selectedFilter == 'All' || mails.kategori == _selectedFilter;
+      final matchesFilter = _selectedFilter == 'All'
+          ? true
+          : _selectedFilter == 'Starred'
+              ? mails.isStarred
+              : mails.kategori == _selectedFilter;
       final matchesSearch =
           mails.nama.toLowerCase().contains(_searchQuery.toLowerCase());
       return matchesFilter && matchesSearch;
@@ -228,13 +251,78 @@ class _MailsAdmin extends State<MailsAdmin> {
             return Container(
               color: cardColor,
               child: ListTile(
-                title: Text(
-                  mail.nama,
-                  style: TextStyle(
-                    color: textColor,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                title: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            IconButton(
+                              icon: Icon(
+                                mail.isStarred ? Icons.star : Icons.star_border,
+                                color:
+                                    mail.isStarred ? Colors.yellow : textColor,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  mailProvider.toggleMailStar(mail.nama);
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                        if (mail.status == MailStatus.pending)
+                          Row(
+                            children: [
+                              IconButton(
+                                icon: Icon(
+                                  Icons.check,
+                                  color: Colors.green,
+                                ),
+                                onPressed: () {
+                                  mailProvider.changeMailStatus(
+                                      mail.nama, MailStatus.approved);
+                                },
+                              ),
+                              IconButton(
+                                icon: Icon(
+                                  Icons.clear,
+                                  color: Colors.red,
+                                ),
+                                onPressed: () {
+                                  _showNotApprovedDialog(
+                                      context, mail, mailProvider);
+                                },
+                              ),
+                            ],
+                          ),
+                        IconButton(
+                          icon: Icon(
+                            Icons.delete,
+                            color: Colors.red,
+                          ),
+                          onPressed: () {
+                            _showDeleteConfirmationDialog(
+                                context, mail.nama, mailProvider);
+                          },
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          mail.nama,
+                          style: TextStyle(
+                            color: textColor,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    )
+                  ],
                 ),
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -264,59 +352,27 @@ class _MailsAdmin extends State<MailsAdmin> {
                     Text(
                       'Isi: ${mail.isi}',
                       style: TextStyle(color: textColor),
+                      overflow: TextOverflow.ellipsis,
                     ),
                     Text(
                       'Kategori: ${mail.kategori}',
                       style: TextStyle(color: textColor),
+                      overflow: TextOverflow.ellipsis,
                     ),
                     if (mail.status == MailStatus.notApproved &&
                         mail.alasan != null)
                       Text(
                         'Alasan: ${mail.alasan}',
                         style: TextStyle(color: Colors.red),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     if (mail.status == MailStatus.notApproved &&
                         mail.alasan == null)
                       Text(
                         'Surat tidak disetujui tanpa alasan.',
                         style: TextStyle(color: Colors.red),
+                        overflow: TextOverflow.ellipsis,
                       ),
-                  ],
-                ),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (mail.status == MailStatus.pending)
-                      IconButton(
-                        icon: Icon(
-                          Icons.check,
-                          color: Colors.green,
-                        ),
-                        onPressed: () {
-                          mailProvider.changeMailStatus(
-                              mail.nama, MailStatus.approved);
-                        },
-                      ),
-                    if (mail.status == MailStatus.pending)
-                      IconButton(
-                        icon: Icon(
-                          Icons.clear,
-                          color: Colors.red,
-                        ),
-                        onPressed: () {
-                          _showNotApprovedDialog(context, mail, mailProvider);
-                        },
-                      ),
-                    IconButton(
-                      icon: Icon(
-                        Icons.delete,
-                        color: Colors.red,
-                      ),
-                      onPressed: () {
-                        _showDeleteConfirmationDialog(
-                            context, mail.nama, mailProvider);
-                      },
-                    ),
                   ],
                 ),
               ),

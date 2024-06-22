@@ -125,14 +125,14 @@ class _VerifCodeState extends State<VerifCode> {
                           color: textColor,
                           width: 2.0,
                         ),
-                        borderRadius: BorderRadius.circular(10.0),
+                        borderRadius: BorderRadius.circular(0),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(
-                          color: Colors.white,
+                        borderSide: BorderSide(
+                          color: textColor,
                           width: 2.0,
                         ),
-                        borderRadius: BorderRadius.circular(5.0),
+                        borderRadius: BorderRadius.circular(100.0),
                       ),
                     ),
                     onChanged: (value) {
@@ -159,6 +159,8 @@ class _VerifCodeState extends State<VerifCode> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('Please fill all verification code boxes.'),
+                      backgroundColor: Colors.red,
+                      duration: Duration(seconds: 1),
                     ),
                   );
                 }

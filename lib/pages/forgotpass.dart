@@ -12,6 +12,15 @@ class ForgotPass extends StatefulWidget {
 }
 
 class _ForgotPass extends State<ForgotPass> {
+  void _showSnackBar(BuildContext context) {
+    final snackBar = SnackBar(
+      content: Text('Please use the correct format of email!'),
+      backgroundColor: Colors.red,
+      duration: Duration(seconds: 1),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   String _email = '';
   bool _isButtonEnabled = false;
   final TextEditingController _emailController = TextEditingController();
@@ -173,12 +182,13 @@ class _ForgotPass extends State<ForgotPass> {
             ),
             SizedBox(height: 25),
             ElevatedButton(
-              onPressed:
-                  _isButtonEnabled // Atur fungsi onPressed berdasarkan keadaan tombol
-                      ? () {
-                          _handleSendCode();
-                        }
-                      : null,
+              onPressed: () {
+                if (_isButtonEnabled) {
+                  _handleSendCode();
+                } else {
+                  _showSnackBar(context); // Call the function directly
+                }
+              },
               style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red, minimumSize: Size(200, 50)),
               child: Text(
