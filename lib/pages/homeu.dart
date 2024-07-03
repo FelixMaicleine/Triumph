@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, use_key_in_widget_constructors, library_private_types_in_public_api, prefer_final_fields, prefer_const_literals_to_create_immutables, use_super_parameters, file_names
+// ignore_for_file: prefer_const_constructors, use_key_in_widget_constructors, library_private_types_in_public_api, prefer_final_fields, prefer_const_literals_to_create_immutables, use_super_parameters, file_names, sized_box_for_whitespace
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -67,34 +67,57 @@ class _HomeU extends State<HomeU> {
                   child: ListView(
                     padding: EdgeInsets.zero,
                     children: <Widget>[
-                      DrawerHeader(
-                        decoration: BoxDecoration(
-                          color: themeProvider.enableDarkMode
-                              ? Colors.grey.shade800
-                              : Colors.red,
-                        ),
-                        padding: EdgeInsets.fromLTRB(10, 30, 10, 10),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            CircleAvatar(
-                              radius: 40.0,
-                              backgroundColor: Colors.white,
-                              child: Icon(
-                                Icons.person,
-                                size: 50.0,
-                                color: Colors.red,
+                      Container(
+                        height: 215,
+                        child: DrawerHeader(
+                          decoration: BoxDecoration(
+                            color: themeProvider.enableDarkMode
+                                ? Colors.grey.shade800
+                                : Colors.red,
+                          ),
+                          padding: EdgeInsets.fromLTRB(10, 20, 10, 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              CircleAvatar(
+                                radius: 40.0,
+                                backgroundColor: Colors.white,
+                                child: Icon(
+                                  Icons.person,
+                                  size: 50.0,
+                                  color: Colors.red,
+                                ),
                               ),
-                            ),
-                            SizedBox(height: 10),
-                            Text(
-                              'Felix Maicleine',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
+                              SizedBox(height: 3),
+                              Row(
+                                children: [
+                                  SizedBox(width: 19),
+                                  Text(
+                                    'User',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 20,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                          ],
+                              SizedBox(height: 10),
+                              Text(
+                                'Felix Maicleine',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                ),
+                              ),
+                              Text(
+                                'felixmaicleine@gmail.com',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 15,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                       ListTile(
@@ -340,20 +363,20 @@ class _HomeU extends State<HomeU> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.edit_document),
-            label: 'Create Mail',
-          ),
-          BottomNavigationBarItem(
             icon: Icon(Icons.mail),
             label: 'Mails',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.edit_document),
+            label: 'Create Mail',
           ),
         ],
         onTap: (int index) {
           if (index == 1) {
-            Navigator.pushNamed(context, '/create');
+            Navigator.pushNamed(context, '/mailsuser');
           }
           if (index == 2) {
-            Navigator.pushNamed(context, '/mailsuser');
+            Navigator.pushNamed(context, '/create');
           }
         },
       ),

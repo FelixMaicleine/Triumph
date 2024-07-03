@@ -4,13 +4,14 @@ import 'dart:io';
 enum MailStatus {
   pending,
   approved,
-  notApproved,
+  declined,
 }
 
 class MailItem {
   final String nama;
   final String isi;
   final String kategori;
+  final DateTime dateTime;
   MailStatus status;
   String? alasan;
   String? imagePath;
@@ -22,6 +23,7 @@ class MailItem {
     required this.nama,
     required this.isi,
     this.kategori = 'Personal',
+    required this.dateTime,
     this.status = MailStatus.pending,
     this.alasan,
     this.imagePath,
@@ -38,8 +40,8 @@ class MailProvider with ChangeNotifier {
       _mailss.where((mail) => mail.status == MailStatus.pending).toList();
   List<MailItem> get approvedMails =>
       _mailss.where((mail) => mail.status == MailStatus.approved).toList();
-  List<MailItem> get notApprovedMails =>
-      _mailss.where((mail) => mail.status == MailStatus.notApproved).toList();
+  List<MailItem> get declinedMails =>
+      _mailss.where((mail) => mail.status == MailStatus.declined).toList();
   List<MailItem> get starredMails =>
       _mailss.where((mail) => mail.isStarred).toList();
 
@@ -52,15 +54,17 @@ class MailProvider with ChangeNotifier {
         status: MailStatus.approved,
         isDefaultImage: true,
         isStarred: true,
+        dateTime: DateTime.now(),
       ),
       MailItem(
         nama: 'Surat pengunduran diri Z',
         isi: 'Pengunduran diri karyawan Z',
         kategori: 'Work',
-        status: MailStatus.notApproved,
+        status: MailStatus.declined,
         alasan: "perusahaan sedang butuh karyawan",
         isDefaultImage: true,
         isStarred: true,
+        dateTime: DateTime.now(),
       ),
       MailItem(
         nama: 'Surat Selamat Ultah',
@@ -68,6 +72,7 @@ class MailProvider with ChangeNotifier {
         kategori: 'Personal',
         status: MailStatus.approved,
         isDefaultImage: true,
+        dateTime: DateTime.now(),
       ),
       MailItem(
         nama: 'Surat izin A',
@@ -76,6 +81,7 @@ class MailProvider with ChangeNotifier {
         status: MailStatus.pending,
         isDefaultImage: true,
         isStarred: true,
+        dateTime: DateTime.now(),
       ),
       MailItem(
         nama: 'Surat izin B',
@@ -84,6 +90,7 @@ class MailProvider with ChangeNotifier {
         status: MailStatus.pending,
         isDefaultImage: true,
         isStarred: true,
+        dateTime: DateTime.now(),
       ),
       MailItem(
         nama: 'Surat izin C',
@@ -91,16 +98,19 @@ class MailProvider with ChangeNotifier {
         kategori: 'Work',
         status: MailStatus.pending,
         isDefaultImage: true,
+        dateTime: DateTime.now(),
       ),
     ];
   }
 
-  void addMail(MailItem mail) {
+  Future<void> addMail(MailItem mail) async {
+    await Future.delayed(const Duration(seconds: 1));
     _mailss.add(mail);
     notifyListeners();
   }
 
-  void addMailWithImage(MailItem mail, File imageFile) async {
+  Future<void> addMailWithImage(MailItem mail, File imageFile) async {
+    await Future.delayed(const Duration(seconds: 1));
     String imagePath = imageFile.path;
     mail.imagePath = imagePath;
     _mailss.add(mail);
@@ -116,7 +126,7 @@ class MailProvider with ChangeNotifier {
     final mailIndex = _mailss.indexWhere((mail) => mail.nama == nama);
     if (mailIndex != -1) {
       _mailss[mailIndex].status = newStatus;
-      if (newStatus == MailStatus.notApproved) {
+      if (newStatus == MailStatus.declined) {
         _mailss[mailIndex].alasan = alasan;
       }
       notifyListeners();

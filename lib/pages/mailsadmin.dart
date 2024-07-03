@@ -46,8 +46,8 @@ class _MailsAdmin extends State<MailsAdmin> {
     final approvedMails = _filteredmailss
         .where((mail) => mail.status == MailStatus.approved)
         .toList();
-    final notApprovedMails = _filteredmailss
-        .where((mail) => mail.status == MailStatus.notApproved)
+    final declinedMails = _filteredmailss
+        .where((mail) => mail.status == MailStatus.declined)
         .toList();
 
     return Scaffold(
@@ -122,7 +122,7 @@ class _MailsAdmin extends State<MailsAdmin> {
                         color: textColor,
                       ),
                     ),
-                    _buildExpansionPanelList(approvedMails + notApprovedMails,
+                    _buildExpansionPanelList(approvedMails + declinedMails,
                         textColor, cardColor, mailProvider),
                   ],
                 ),
@@ -197,22 +197,19 @@ class _MailsAdmin extends State<MailsAdmin> {
         backgroundColor: bottomNavBarColor,
         selectedItemColor: Colors.red,
         unselectedItemColor: textColor,
+        currentIndex: 1,
         items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.mail),
-            label: 'Mails',
-          ),
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.edit_document),
-            label: 'Create Mail',
+            icon: Icon(Icons.mail),
+            label: 'Mails',
           ),
         ],
         onTap: (int index) {
-          if (index == 1) {
+          if (index == 0) {
             Navigator.pushNamed(context, '/homeadmin');
           }
           if (index == 2) {
@@ -291,7 +288,7 @@ class _MailsAdmin extends State<MailsAdmin> {
                                   color: Colors.red,
                                 ),
                                 onPressed: () {
-                                  _showNotApprovedDialog(
+                                  _showdeclinedDialog(
                                       context, mail, mailProvider);
                                 },
                               ),
@@ -321,7 +318,15 @@ class _MailsAdmin extends State<MailsAdmin> {
                           overflow: TextOverflow.ellipsis,
                         ),
                       ],
-                    )
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          '${mail.dateTime.day}/${mail.dateTime.month}/${mail.dateTime.year} ${mail.dateTime.hour}:${mail.dateTime.minute}',
+                          style: TextStyle(color: textColor),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
                 subtitle: Column(
@@ -344,32 +349,32 @@ class _MailsAdmin extends State<MailsAdmin> {
                               ? 'Pending'
                               : mail.status == MailStatus.approved
                                   ? 'Approved'
-                                  : 'Not Approved',
+                                  : 'Declined',
                           style: TextStyle(color: textColor),
                         ),
                       ],
                     ),
                     Text(
-                      'Isi: ${mail.isi}',
+                      'Content: ${mail.isi}',
                       style: TextStyle(color: textColor),
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
-                      'Kategori: ${mail.kategori}',
+                      'Category: ${mail.kategori}',
                       style: TextStyle(color: textColor),
                       overflow: TextOverflow.ellipsis,
                     ),
-                    if (mail.status == MailStatus.notApproved &&
+                    if (mail.status == MailStatus.declined &&
                         mail.alasan != null)
                       Text(
-                        'Alasan: ${mail.alasan}',
+                        'Reason: ${mail.alasan}',
                         style: TextStyle(color: Colors.red),
                         overflow: TextOverflow.ellipsis,
                       ),
-                    if (mail.status == MailStatus.notApproved &&
+                    if (mail.status == MailStatus.declined &&
                         mail.alasan == null)
                       Text(
-                        'Surat tidak disetujui tanpa alasan.',
+                        'Mails declined without reason.',
                         style: TextStyle(color: Colors.red),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -434,7 +439,7 @@ class _MailsAdmin extends State<MailsAdmin> {
     );
   }
 
-  void _showNotApprovedDialog(
+  void _showdeclinedDialog(
       BuildContext context, MailItem mail, MailProvider mailProvider) {
     TextEditingController _reasonController = TextEditingController();
 
@@ -458,7 +463,7 @@ class _MailsAdmin extends State<MailsAdmin> {
               child: Text('Kirim'),
               onPressed: () {
                 String reason = _reasonController.text.trim();
-                mailProvider.changeMailStatus(mail.nama, MailStatus.notApproved,
+                mailProvider.changeMailStatus(mail.nama, MailStatus.declined,
                     alasan: reason);
                 Navigator.of(context).pop();
               },

@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, use_key_in_widget_constructors, library_private_types_in_public_api, prefer_final_fields, prefer_const_literals_to_create_immutables, use_super_parameters, file_names
+// ignore_for_file: prefer_const_constructors, use_key_in_widget_constructors, library_private_types_in_public_api, prefer_final_fields, prefer_const_literals_to_create_immutables, use_super_parameters, file_names, sized_box_for_whitespace
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -67,34 +67,57 @@ class _HomeA extends State<HomeA> {
                   child: ListView(
                     padding: EdgeInsets.zero,
                     children: <Widget>[
-                      DrawerHeader(
-                        decoration: BoxDecoration(
-                          color: themeProvider.enableDarkMode
-                              ? Colors.grey.shade800
-                              : Colors.red,
-                        ),
-                        padding: EdgeInsets.fromLTRB(10, 30, 10, 10),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            CircleAvatar(
-                              radius: 40.0,
-                              backgroundColor: Colors.white,
-                              child: Icon(
-                                Icons.person,
-                                size: 50.0,
-                                color: Colors.red,
+                      Container(
+                        height: 215,
+                        child: DrawerHeader(
+                          decoration: BoxDecoration(
+                            color: themeProvider.enableDarkMode
+                                ? Colors.grey.shade800
+                                : Colors.red,
+                          ),
+                          padding: EdgeInsets.fromLTRB(10, 20, 10, 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              CircleAvatar(
+                                radius: 40.0,
+                                backgroundColor: Colors.white,
+                                child: Icon(
+                                  Icons.person,
+                                  size: 50.0,
+                                  color: Colors.red,
+                                ),
                               ),
-                            ),
-                            SizedBox(height: 10),
-                            Text(
-                              'Felix Maicleine',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
+                              SizedBox(height: 3),
+                              Row(
+                                children: [
+                                  SizedBox(width: 9),
+                                  Text(
+                                    'Admin',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 20,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                          ],
+                              SizedBox(height: 10),
+                              Text(
+                                'Felix Maicleine',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                ),
+                              ),
+                              Text(
+                                'felixmaicleine@gmail.com',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 15,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                       ListTile(
@@ -112,19 +135,6 @@ class _HomeA extends State<HomeA> {
                       ),
                       ListTile(
                         leading: Icon(
-                          Icons.edit_document,
-                          color: textColor,
-                        ),
-                        title: Text(
-                          'Create Mail',
-                          style: TextStyle(color: textColor),
-                        ),
-                        onTap: () {
-                          Navigator.pushNamed(context, '/create');
-                        },
-                      ),
-                      ListTile(
-                        leading: Icon(
                           Icons.mail,
                           color: textColor,
                         ),
@@ -138,11 +148,11 @@ class _HomeA extends State<HomeA> {
                       ),
                       ListTile(
                         leading: Icon(
-                          Icons.archive,
+                          Icons.pending_actions,
                           color: textColor,
                         ),
                         title: Text(
-                          'Inbox',
+                          'Pending Mails',
                           style: TextStyle(color: textColor),
                         ),
                         onTap: () {
@@ -151,15 +161,28 @@ class _HomeA extends State<HomeA> {
                       ),
                       ListTile(
                         leading: Icon(
-                          Icons.outbox,
+                          Icons.check,
                           color: textColor,
                         ),
                         title: Text(
-                          'Outbox',
+                          'Approved Mails',
                           style: TextStyle(color: textColor),
                         ),
                         onTap: () {
-                          Navigator.pushNamed(context, '/berstatusadmin');
+                          Navigator.pushNamed(context, '/approvedadmin');
+                        },
+                      ),
+                      ListTile(
+                        leading: Icon(
+                          Icons.close,
+                          color: textColor,
+                        ),
+                        title: Text(
+                          'Declined Mails',
+                          style: TextStyle(color: textColor),
+                        ),
+                        onTap: () {
+                          Navigator.pushNamed(context, '/notapprovedadmin');
                         },
                       ),
                     ],
@@ -212,7 +235,7 @@ class _HomeA extends State<HomeA> {
               Row(
                 children: [
                   Text(
-                    'Felix Maicleine (Admin)',
+                    'Felix Maicleine',
                     style: TextStyle(
                       fontSize: 30,
                       fontWeight: FontWeight.bold,
@@ -229,31 +252,6 @@ class _HomeA extends State<HomeA> {
                 mainAxisSpacing: 20,
                 padding: EdgeInsets.symmetric(vertical: 20),
                 children: [
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(context, '/create');
-                    },
-                    child: Card(
-                      color: cardColor,
-                      elevation: 4,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(100),
-                      ),
-                      child: Center(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.edit_document,
-                                size: 50, color: Colors.red),
-                            SizedBox(height: 10),
-                            Text('Create Mail',
-                                style:
-                                    TextStyle(fontSize: 18, color: textColor)),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
                   GestureDetector(
                     onTap: () {
                       Navigator.pushNamed(context, '/mailsadmin');
@@ -292,9 +290,10 @@ class _HomeA extends State<HomeA> {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.archive, size: 50, color: Colors.red),
+                            Icon(Icons.pending_actions,
+                                size: 50, color: Colors.red),
                             SizedBox(height: 10),
-                            Text('Inbox',
+                            Text('Pending Mails',
                                 style:
                                     TextStyle(fontSize: 18, color: textColor)),
                           ],
@@ -304,7 +303,7 @@ class _HomeA extends State<HomeA> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      Navigator.pushNamed(context, '/berstatusadmin');
+                      Navigator.pushNamed(context, '/approvedadmin');
                     },
                     child: Card(
                       color: cardColor,
@@ -316,9 +315,33 @@ class _HomeA extends State<HomeA> {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.outbox, size: 50, color: Colors.red),
+                            Icon(Icons.check, size: 50, color: Colors.red),
                             SizedBox(height: 10),
-                            Text('Outbox',
+                            Text('Approved Mails',
+                                style:
+                                    TextStyle(fontSize: 18, color: textColor)),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(context, '/notapprovedadmin');
+                    },
+                    child: Card(
+                      color: cardColor,
+                      elevation: 4,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(100),
+                      ),
+                      child: Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.close, size: 50, color: Colors.red),
+                            SizedBox(height: 10),
+                            Text('Declined Mails',
                                 style:
                                     TextStyle(fontSize: 18, color: textColor)),
                           ],
@@ -342,20 +365,16 @@ class _HomeA extends State<HomeA> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.edit_document),
-            label: 'Create Mail',
-          ),
-          BottomNavigationBarItem(
             icon: Icon(Icons.mail),
             label: 'Mails',
           ),
         ],
         onTap: (int index) {
           if (index == 1) {
-            Navigator.pushNamed(context, '/create');
+            Navigator.pushNamed(context, '/mailsadmin');
           }
           if (index == 2) {
-            Navigator.pushNamed(context, '/mailsadmin');
+            Navigator.pushNamed(context, '/create');
           }
         },
       ),

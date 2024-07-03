@@ -11,7 +11,7 @@ class ThemeProvider extends ChangeNotifier {
     primarySwatch: Colors.purple,
   );
 
-  bool _enableDarkMode = false;
+  bool _enableDarkMode = true;
 
   bool get enableDarkMode => _enableDarkMode;
 
