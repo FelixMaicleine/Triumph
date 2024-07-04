@@ -23,15 +23,58 @@ class _LoginUser extends State<LoginUser> {
 
   final TextEditingController _usernameController = TextEditingController();
 
-  Map<String, String>? _message;
-
   int? _staySignedIn;
   bool _agreedToTerms = false;
 
+  void _handleLogin(BuildContext context) async {
+    if (_agreedToTerms) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+          backgroundColor: Colors.red,
+          content: Row(
+            children: [
+              CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation(Colors.white),
+              ),
+              SizedBox(width: 20),
+              Text(
+                'Logging In...',
+                style: TextStyle(color: Colors.white),
+              ),
+            ],
+          ),
+        );
+        },
+      );
+
+      await Future.delayed(Duration(seconds: 2));
+
+      Navigator.pop(context);
+
+      // Tampilkan SnackBar untuk login success
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Login Success'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+        ),
+      );
+
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        '/homeuser',
+        ModalRoute.withName('/'),
+      );
+    } else {
+      _showSnackBar(context);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    _message =
-        ModalRoute.of(context)?.settings.arguments as Map<String, String>?;
     final themeProvider = Provider.of<ThemeProvider>(context);
     final ThemeData themeData = themeProvider.getCurrentTheme();
     final Color textColor = themeData.textTheme.bodyLarge!.color!;
@@ -53,7 +96,6 @@ class _LoginUser extends State<LoginUser> {
         title: Image.asset(
           'assets/logo.png',
           width: 250,
-          // height: 3000,
         ),
         centerTitle: true,
         actions: [
@@ -86,15 +128,6 @@ class _LoginUser extends State<LoginUser> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              if (_message != null)
-                Column(
-                  children: [
-                    Text(_message!['line1']!,
-                        style: TextStyle(color: textColor)),
-                    Text(_message!['line2']!,
-                        style: TextStyle(color: textColor)),
-                  ],
-                ),
               Row(
                 children: [
                   Text(
@@ -236,17 +269,7 @@ class _LoginUser extends State<LoginUser> {
                 ],
               ),
               ElevatedButton(
-                onPressed: () {
-                  if (_agreedToTerms) {
-                    Navigator.pushNamedAndRemoveUntil(
-                      context,
-                      '/homeuser',
-                      ModalRoute.withName('/'),
-                    );
-                  } else {
-                    _showSnackBar(context); // Call the function directly
-                  }
-                },
+                onPressed: () => _handleLogin(context),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,
                   minimumSize: Size(200, 50),

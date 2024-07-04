@@ -6,7 +6,6 @@ import 'package:triumph2/provider/theme.dart';
 import 'package:triumph2/provider/mailprovider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-
 import 'dart:io';
 
 class CreateMail extends StatefulWidget {
@@ -18,13 +17,11 @@ class _CreateMailState extends State<CreateMail> {
   TextEditingController _namaController = TextEditingController();
   TextEditingController _isiController = TextEditingController();
   String _selectedCategory = 'Personal';
-  File? _selectedImage; // Add this field to hold the selected image
-  bool _isLoading = false; // Add this field to track loading state
+  File? _selectedImage;
 
   DateTime _selectedDate = DateTime.now();
   TimeOfDay _selectedTime = TimeOfDay.now();
 
-  // Function to pick image
   Future<void> _pickImage() async {
     final pickedFile =
         await ImagePicker().pickImage(source: ImageSource.gallery);
@@ -70,11 +67,37 @@ class _CreateMailState extends State<CreateMail> {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
+  void _showLoadingDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.red,
+          content: Row(
+            children: [
+              CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation(Colors.white),
+              ),
+              SizedBox(width: 20),
+              Text(
+                'Saving...',
+                style: TextStyle(color: Colors.white),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _hideLoadingDialog(BuildContext context) {
+    Navigator.of(context).pop();
+  }
+
   Future<void> _saveMail(
       BuildContext context, MailProvider mailProvider) async {
-    setState(() {
-      _isLoading = true;
-    });
+    _showLoadingDialog(context);
 
     final DateTime selectedDateTime = DateTime(
       _selectedDate.year,
@@ -97,9 +120,7 @@ class _CreateMailState extends State<CreateMail> {
 
     await mailProvider.addMail(newMail);
 
-    setState(() {
-      _isLoading = false;
-    });
+    _hideLoadingDialog(context);
 
     _showSnackBar(context);
     Navigator.pop(context);
@@ -160,250 +181,243 @@ class _CreateMailState extends State<CreateMail> {
         child: Center(
           child: Padding(
             padding: const EdgeInsets.all(10),
-            child: _isLoading
-                ? CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
-                    backgroundColor: Colors.white,
-                  )
-                : SingleChildScrollView(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Row(
-                          children: [
-                            Text(
-                              'Title',
-                              style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: textColor),
-                            ),
-                          ],
-                        ),
-                        TextFormField(
-                          style: TextStyle(color: textColor),
-                          controller: _namaController,
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                              borderSide: BorderSide(color: textColor),
-                            ),
-                            hintText: 'Title',
-                            hintStyle: TextStyle(color: textColor),
-                            prefixIcon: Icon(Icons.mail, color: textColor),
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        Row(
-                          children: [
-                            Text(
-                              'Content',
-                              style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: textColor),
-                            ),
-                          ],
-                        ),
-                        TextFormField(
-                          style: TextStyle(color: textColor),
-                          controller: _isiController,
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                              borderSide: BorderSide(color: textColor),
-                            ),
-                            hintText: 'Content',
-                            hintStyle: TextStyle(color: textColor),
-                            prefixIcon: Icon(Icons.mail, color: textColor),
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        Row(
-                          children: [
-                            Text(
-                              'Category',
-                              style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: textColor),
-                            ),
-                          ],
-                        ),
-                        DropdownButtonFormField(
-                          style: TextStyle(color: textColor),
-                          dropdownColor: themeProvider.enableDarkMode
-                              ? Colors.grey.shade800
-                              : Colors.white,
-                          value: _selectedCategory,
-                          onChanged: (value) {
-                            setState(() {
-                              _selectedCategory = value.toString();
-                            });
-                          },
-                          items: ['Personal', 'Work', 'Others']
-                              .map<DropdownMenuItem<String>>((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(value),
-                            );
-                          }).toList(),
-                        ),
-                        SizedBox(height: 20),
-                        Row(
-                          children: [
-                            Text(
-                              'Date',
-                              style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: textColor),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 10),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                "Selected Date: ${DateFormat('yyyy-MM-dd').format(_selectedDate)}",
-                                style: TextStyle(color: textColor),
-                              ),
-                            ),
-                            ElevatedButton(
-                              onPressed: () => _selectDate(context),
-                              style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.red,
-                                  minimumSize: Size(210, 50)),
-                              child: Text(
-                                'Select Date',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 10),
-                        Row(
-                          children: [
-                            Text(
-                              'Time',
-                              style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: textColor),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 10),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                "Selected Time: ${_selectedTime.format(context)}",
-                                style: TextStyle(color: textColor),
-                              ),
-                            ),
-                            ElevatedButton(
-                              onPressed: () => _selectTime(context),
-                              style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.red,
-                                  minimumSize: Size(210, 50)),
-                              child: Text(
-                                'Select Time',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 20),
-                        Row(
-                          children: [
-                            Text(
-                              'File',
-                              style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: textColor),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 10),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            ElevatedButton.icon(
-                              onPressed: _pickImage,
-                              icon: Icon(
-                                Icons.photo_library,
-                                color: Colors.white,
-                              ),
-                              label: Text(
-                                'Pick Image',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                              style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.red,
-                                  minimumSize: Size(210, 50)),
-                            ),
-                            SizedBox(width: 10),
-                            if (_selectedImage != null)
-                              Image.file(
-                                _selectedImage!,
-                                height: 100,
-                                width: 100,
-                                fit: BoxFit.cover,
-                              ),
-                            if (_selectedImage == null)
-                              Text(
-                                'No image selected.',
-                                style: TextStyle(color: textColor),
-                              ),
-                          ],
-                        ),
-                        SizedBox(height: 20),
-                        Row(
-                          children: [
-                            Expanded(
-                                child: ElevatedButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.white,
-                                  minimumSize: Size(200, 50)),
-                              child: Text(
-                                'Back',
-                                style: TextStyle(
-                                    color: Colors.red,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            )),
-                            SizedBox(
-                              width: 10,
-                            ),
-                            Expanded(
-                              child: ElevatedButton(
-                                onPressed: () =>
-                                    _saveMail(context, mailProvider),
-                                style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.red,
-                                    minimumSize: Size(200, 50)),
-                                child: Text(
-                                  'Save',
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                        SizedBox(
-                          height: 75,
-                        ),
-                      ],
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        'Title',
+                        style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: textColor),
+                      ),
+                    ],
+                  ),
+                  TextFormField(
+                    style: TextStyle(color: textColor),
+                    controller: _namaController,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        borderSide: BorderSide(color: textColor),
+                      ),
+                      hintText: 'Title',
+                      hintStyle: TextStyle(color: textColor),
+                      prefixIcon: Icon(Icons.mail, color: textColor),
                     ),
                   ),
+                  SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Text(
+                        'Content',
+                        style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: textColor),
+                      ),
+                    ],
+                  ),
+                  TextFormField(
+                    style: TextStyle(color: textColor),
+                    controller: _isiController,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        borderSide: BorderSide(color: textColor),
+                      ),
+                      hintText: 'Content',
+                      hintStyle: TextStyle(color: textColor),
+                      prefixIcon: Icon(Icons.mail, color: textColor),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Text(
+                        'Category',
+                        style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: textColor),
+                      ),
+                    ],
+                  ),
+                  DropdownButtonFormField(
+                    style: TextStyle(color: textColor),
+                    dropdownColor: themeProvider.enableDarkMode
+                        ? Colors.grey.shade800
+                        : Colors.white,
+                    value: _selectedCategory,
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedCategory = value.toString();
+                      });
+                    },
+                    items: ['Personal', 'Work', 'Others']
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  ),
+                  SizedBox(height: 20),
+                  Row(
+                    children: [
+                      Text(
+                        'Date',
+                        style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: textColor),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          "Selected Date: ${DateFormat('yyyy-MM-dd').format(_selectedDate)}",
+                          style: TextStyle(color: textColor),
+                        ),
+                      ),
+                      ElevatedButton(
+                        onPressed: () => _selectDate(context),
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            minimumSize: Size(210, 50)),
+                        child: Text(
+                          'Select Date',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Text(
+                        'Time',
+                        style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: textColor),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          "Selected Time: ${_selectedTime.format(context)}",
+                          style: TextStyle(color: textColor),
+                        ),
+                      ),
+                      ElevatedButton(
+                        onPressed: () => _selectTime(context),
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            minimumSize: Size(210, 50)),
+                        child: Text(
+                          'Select Time',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 20),
+                  Row(
+                    children: [
+                      Text(
+                        'File',
+                        style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: textColor),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      ElevatedButton.icon(
+                        onPressed: _pickImage,
+                        icon: Icon(
+                          Icons.photo_library,
+                          color: Colors.white,
+                        ),
+                        label: Text(
+                          'Pick Image',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            minimumSize: Size(210, 50)),
+                      ),
+                      SizedBox(width: 10),
+                      if (_selectedImage != null)
+                        Image.file(
+                          _selectedImage!,
+                          height: 100,
+                          width: 100,
+                          fit: BoxFit.cover,
+                        ),
+                      if (_selectedImage == null)
+                        Text(
+                          'No image selected.',
+                          style: TextStyle(color: textColor),
+                        ),
+                    ],
+                  ),
+                  SizedBox(height: 20),
+                  Row(
+                    children: [
+                      Expanded(
+                          child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            minimumSize: Size(200, 50)),
+                        child: Text(
+                          'Back',
+                          style: TextStyle(
+                              color: Colors.red, fontWeight: FontWeight.bold),
+                        ),
+                      )),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () => _saveMail(context, mailProvider),
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red,
+                              minimumSize: Size(200, 50)),
+                          child: Text(
+                            'Save',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                  SizedBox(
+                    height: 75,
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       ),

@@ -54,9 +54,34 @@ class _ForgotPass extends State<ForgotPass> {
     }
   }
 
-  void _handleSendCode() {
+  void _handleSendCode() async {
     if (_emailErrorText == null) {
-      // Jika email valid, lanjutkan dengan mengirim kode
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            backgroundColor: Colors.red,
+            content: Row(
+              children: [
+                CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation(Colors.white),
+                ),
+                SizedBox(width: 20),
+                Text(
+                  'Sending code...',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+
+      await Future.delayed(Duration(seconds: 2));
+
+      Navigator.pop(context);
+      
       Navigator.pushNamed(context, '/verify');
     }
   }

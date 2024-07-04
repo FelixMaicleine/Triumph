@@ -21,6 +21,53 @@ class _LoginAdmin extends State<LoginAdmin> {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
+  void _handleLogin(BuildContext context) async {
+    if (_agreedToTerms) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+          backgroundColor: Colors.red,
+          content: Row(
+            children: [
+              CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation(Colors.white),
+              ),
+              SizedBox(width: 20),
+              Text(
+                'Logging In...',
+                style: TextStyle(color: Colors.white),
+              ),
+            ],
+          ),
+        );
+        },
+      );
+
+      await Future.delayed(Duration(seconds: 2));
+
+      Navigator.pop(context);
+
+      // Tampilkan SnackBar untuk login success
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Login Success'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+        ),
+      );
+
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        '/homeadmin',
+        ModalRoute.withName('/'),
+      );
+    } else {
+      _showSnackBar(context);
+    }
+  }
+
   final TextEditingController _usernameController = TextEditingController();
 
   Map<String, String>? _message;
@@ -268,17 +315,7 @@ class _LoginAdmin extends State<LoginAdmin> {
                 ],
               ),
               ElevatedButton(
-                onPressed: () {
-                  if (_agreedToTerms) {
-                    Navigator.pushNamedAndRemoveUntil(
-                      context,
-                      '/homeadmin',
-                      ModalRoute.withName('/'),
-                    );
-                  } else {
-                    _showSnackBar(context); // Call the function directly
-                  }
-                },
+                onPressed: () => _handleLogin(context),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,
                   minimumSize: Size(200, 50),

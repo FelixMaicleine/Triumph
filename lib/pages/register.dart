@@ -99,16 +99,46 @@ class _Register extends State<Register> {
     });
   }
 
-  void _handleRegister() {
-    // Handle register logic here
+  void _handleRegister() async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.red,
+          content: Row(
+            children: [
+              CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation(Colors.white),
+              ),
+              SizedBox(width: 20),
+              Text(
+                'Creating account...',
+                style: TextStyle(color: Colors.white),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+
+    await Future.delayed(Duration(seconds: 2));
+
+    Navigator.pop(context);
+
+    final snackBar = SnackBar(
+      content: Text(
+          'Your account has been created successfully. Try logging in with your new account.'),
+      backgroundColor: Colors.green,
+      duration: Duration(seconds: 3),
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
     Navigator.pushNamedAndRemoveUntil(
       context,
       '/loginuser',
       ModalRoute.withName('/'),
-      arguments: {
-        'line1': 'Your account has been created successfully',
-        'line2': 'Try login with your new account',
-      },
     );
   }
 
@@ -513,7 +543,7 @@ class _Register extends State<Register> {
                         if (_isButtonEnabled) {
                           _handleRegister();
                         } else {
-                          _showSnackBar(context); // Call the function directly
+                          _showSnackBar(context);
                         }
                       },
                       style: ElevatedButton.styleFrom(

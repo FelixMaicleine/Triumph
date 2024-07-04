@@ -59,18 +59,49 @@ class _ChangePass extends State<ChangePass> {
     });
   }
 
-  void _handleChangePassword() {
+  void _handleChangePassword() async {
     // Melakukan validasi kata sandi sebelum mengubahnya
     if (_validatePassword(_newPassword) == null) {
       if (_newPassword == _confirmPassword) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              backgroundColor: Colors.red,
+              content: Row(
+                children: [
+                  CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation(Colors.white),
+                  ),
+                  SizedBox(width: 20),
+                  Text(
+                    'Changing password...',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+
+        await Future.delayed(Duration(seconds: 2));
+
+        Navigator.pop(context);
+
+        final snackBar = SnackBar(
+          content: Text(
+              'Your passsword has been changed successfully. Try logging in with your new password.'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 3),
+        );
+
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
         Navigator.pushNamedAndRemoveUntil(
           context,
           '/loginuser',
           ModalRoute.withName('/'),
-          arguments: {
-            'line1': 'Your password has been changed successfully',
-            'line2': 'Try login with your new password',
-          },
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
