@@ -185,6 +185,45 @@ class _HomeU extends State<HomeU> {
                           Navigator.pushNamed(context, '/pendinguser');
                         },
                       ),
+                      ListTile(
+                        leading: Icon(
+                          Icons.star,
+                          color: textColor,
+                        ),
+                        title: Text(
+                          'Favorite Mails',
+                          style: TextStyle(color: textColor),
+                        ),
+                        onTap: () {
+                          Navigator.pushNamed(context, '/favuser');
+                        },
+                      ),
+                      ListTile(
+                        leading: Icon(
+                          Icons.delete,
+                          color: textColor,
+                        ),
+                        title: Text(
+                          'Trash',
+                          style: TextStyle(color: textColor),
+                        ),
+                        onTap: () {
+                          Navigator.pushNamed(context, '/trash');
+                        },
+                      ),
+                      ListTile(
+                        leading: Icon(
+                          Icons.drafts,
+                          color: textColor,
+                        ),
+                        title: Text(
+                          'Draft',
+                          style: TextStyle(color: textColor),
+                        ),
+                        onTap: () {
+                          Navigator.pushNamed(context, '/draft');
+                        },
+                      ),
                     ],
                   ),
                 ),

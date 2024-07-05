@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:triumph2/pages/approvedadmin.dart';
 import 'package:triumph2/pages/declinedadmin.dart';
+import 'package:triumph2/pages/draft.dart';
 import 'package:triumph2/pages/editprofileadmin.dart';
+import 'package:triumph2/pages/favadmin.dart';
+import 'package:triumph2/pages/favuser.dart';
 import 'package:triumph2/pages/inboxuser.dart';
 import 'package:triumph2/pages/editprofileuser.dart';
 import 'package:triumph2/pages/homea.dart';
@@ -17,6 +20,7 @@ import 'package:triumph2/pages/landing.dart';
 import 'package:triumph2/pages/loginuser.dart';
 import 'package:triumph2/pages/register.dart';
 import 'package:triumph2/pages/forgotpass.dart';
+import 'package:triumph2/pages/trash.dart';
 import 'package:triumph2/pages/verifcode.dart';
 import 'package:triumph2/pages/changepass.dart';
 import 'package:triumph2/pages/mailsuser.dart';
@@ -67,6 +71,10 @@ class MyApp extends StatelessWidget {
         '/notapprovedadmin': (context) => DeclinedAdmin(),
         '/berstatususer': (context) => InboxUser(),
         '/pendinguser': (context) => OutboxUser(),
+        '/favadmin': (context) => FavAdmin(),
+        '/favuser': (context) => FavUser(),
+        '/trash': (context) => Trash(),
+        '/draft': (context) => Draft(),
       },
     );
   }

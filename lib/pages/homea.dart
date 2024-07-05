@@ -185,6 +185,32 @@ class _HomeA extends State<HomeA> {
                           Navigator.pushNamed(context, '/notapprovedadmin');
                         },
                       ),
+                      ListTile(
+                        leading: Icon(
+                          Icons.star,
+                          color: textColor,
+                        ),
+                        title: Text(
+                          'Favorite Mails',
+                          style: TextStyle(color: textColor),
+                        ),
+                        onTap: () {
+                          Navigator.pushNamed(context, '/favadmin');
+                        },
+                      ),
+                      ListTile(
+                        leading: Icon(
+                          Icons.delete,
+                          color: textColor,
+                        ),
+                        title: Text(
+                          'Trash',
+                          style: TextStyle(color: textColor),
+                        ),
+                        onTap: () {
+                          Navigator.pushNamed(context, '/trash');
+                        },
+                      ),
                     ],
                   ),
                 ),

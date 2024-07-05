@@ -6,12 +6,12 @@ import 'package:provider/provider.dart';
 import 'package:triumph2/provider/theme.dart';
 import 'package:triumph2/provider/mailprovider.dart';
 
-class OutboxUser extends StatefulWidget {
+class FavUser extends StatefulWidget {
   @override
-  _OutboxUser createState() => _OutboxUser();
+  _FavUser createState() => _FavUser();
 }
 
-class _OutboxUser extends State<OutboxUser> {
+class _FavUser extends State<FavUser> {
   late List<MailItem> _filteredmailss;
   late String _selectedFilter;
   late String _searchQuery;
@@ -28,22 +28,20 @@ class _OutboxUser extends State<OutboxUser> {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final ThemeData themeData = themeProvider.getCurrentTheme();
     final Color textColor = themeData.textTheme.bodyLarge!.color!;
-    themeProvider.enableDarkMode ? Colors.white : Colors.black;
+    final Color bottomNavBarColor =
+        themeProvider.enableDarkMode ? Colors.grey.shade900 : Colors.white;
     final Color chipBackgroundColor = themeProvider.enableDarkMode
         ? Colors.grey.shade700
         : Colors.grey.shade300;
     final Color chipSelectedColor = themeProvider.enableDarkMode
         ? Colors.red.shade800
         : Colors.red.shade400;
-    final Color bottomNavBarColor =
-        themeProvider.enableDarkMode ? Colors.grey.shade900 : Colors.white;
     final Color cardColor =
         themeProvider.enableDarkMode ? Colors.grey.shade800 : Colors.white;
     final mailProvider = Provider.of<MailProvider>(context);
     _filteredmailss = _getFilteredMails(mailProvider.mailss);
-    final pendingMails = _filteredmailss
-        .where((mail) => mail.status == MailStatus.pending)
-        .toList();
+    final starredMails =
+        _filteredmailss.where((mail) => mail.isStarred == true).toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -99,7 +97,7 @@ class _OutboxUser extends State<OutboxUser> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Outbox',
+                      'Favorite Mails',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -107,7 +105,7 @@ class _OutboxUser extends State<OutboxUser> {
                       ),
                     ),
                     _buildExpansionPanelList(
-                        pendingMails, textColor, cardColor, mailProvider),
+                        starredMails, textColor, cardColor, mailProvider),
                   ],
                 ),
               ),
@@ -189,8 +187,8 @@ class _OutboxUser extends State<OutboxUser> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.outbox),
-            label: 'Outbox',
+            icon: Icon(Icons.star),
+            label: 'Favorite',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.edit_document),
@@ -223,129 +221,131 @@ class _OutboxUser extends State<OutboxUser> {
   }
 
   Widget _buildExpansionPanelList(List<MailItem> mailsList, Color textColor,
-    Color cardColor, MailProvider mailProvider) {
-  return ExpansionPanelList(
-    expansionCallback: (int index, bool isExpanded) {
-      setState(() {
-        mailProvider.toggleMailExpansion(mailsList[index].nama);
-      });
-    },
-    children: mailsList.map<ExpansionPanel>((MailItem mail) {
-      return ExpansionPanel(
-        backgroundColor: cardColor,
-        headerBuilder: (BuildContext context, bool isExpanded) {
-          return Container(
-            color: cardColor,
-            child: ListTile(
-              title: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          IconButton(
-                            icon: Icon(
-                              mail.isStarred ? Icons.star : Icons.star_border,
-                              color:
-                                  mail.isStarred ? Colors.yellow : textColor,
+      Color cardColor, MailProvider mailProvider) {
+    return ExpansionPanelList(
+      expansionCallback: (int index, bool isExpanded) {
+        setState(() {
+          mailProvider.toggleMailExpansion(mailsList[index].nama);
+        });
+      },
+      children: mailsList.map<ExpansionPanel>((MailItem mail) {
+        return ExpansionPanel(
+          backgroundColor: cardColor,
+          headerBuilder: (BuildContext context, bool isExpanded) {
+            return Container(
+              color: cardColor,
+              child: ListTile(
+                title: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            IconButton(
+                              icon: Icon(
+                                mail.isStarred ? Icons.star : Icons.star_border,
+                                color:
+                                    mail.isStarred ? Colors.yellow : textColor,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  mailProvider.toggleMailStar(mail.nama);
+                                });
+                              },
                             ),
-                            onPressed: () {
-                              setState(() {
-                                mailProvider.toggleMailStar(mail.nama);
-                              });
-                            },
+                          ],
+                        ),
+                        IconButton(
+                          icon: Icon(
+                            Icons.delete,
+                            color: Colors.red,
                           ),
-                        ],
-                      ),
-                      IconButton(
-                        icon: Icon(
-                          Icons.delete,
-                          color: Colors.red,
+                          onPressed: () {
+                            _showDeleteConfirmationDialog(
+                                context, mail.nama, mailProvider);
+                          },
                         ),
-                        onPressed: () {
-                          _showDeleteConfirmationDialog(
-                              context, mail.nama, mailProvider);
-                        },
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          mail.nama,
+                          style: TextStyle(
+                            color: textColor,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          '${mail.dateTime.day}/${mail.dateTime.month}/${mail.dateTime.year} ${mail.dateTime.hour}:${mail.dateTime.minute}',
+                          style: TextStyle(color: textColor),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.circle,
+                          color: mail.status == MailStatus.pending
+                              ? Colors.grey
+                              : mail.status == MailStatus.approved
+                                  ? Colors.green
+                                  : Colors.red,
+                          size: 12,
+                        ),
+                        SizedBox(width: 5),
+                        Text(
+                          mail.status == MailStatus.pending
+                              ? 'Pending'
+                              : mail.status == MailStatus.approved
+                                  ? 'Approved'
+                                  : 'Declined',
+                          style: TextStyle(color: textColor),
+                        ),
+                      ],
+                    ),
+                    Text(
+                      'Content: ${mail.isi}',
+                      style: TextStyle(color: textColor),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Text(
+                      'Category: ${mail.kategori}',
+                      style: TextStyle(color: textColor),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    if (mail.status == MailStatus.declined &&
+                        mail.alasan != null)
                       Text(
-                        mail.nama,
-                        style: TextStyle(
-                          color: textColor,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        'Reason: ${mail.alasan}',
+                        style: TextStyle(color: Colors.red),
                         overflow: TextOverflow.ellipsis,
                       ),
-                    ],
-                  ),
-                  Row(
-                    children: [
+                    if (mail.status == MailStatus.declined &&
+                        mail.alasan == null)
                       Text(
-                        '${mail.dateTime.day}/${mail.dateTime.month}/${mail.dateTime.year} ${mail.dateTime.hour}:${mail.dateTime.minute}',
-                        style: TextStyle(color: textColor),
+                        'Mails declined without reason.',
+                        style: TextStyle(color: Colors.red),
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    ],
-                  ),
-                ],
+                  ],
+                ),
               ),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.circle,
-                        color: mail.status == MailStatus.pending
-                            ? Colors.grey
-                            : mail.status == MailStatus.approved
-                                ? Colors.green
-                                : Colors.red,
-                        size: 12,
-                      ),
-                      SizedBox(width: 5),
-                      Text(
-                        mail.status == MailStatus.pending
-                            ? 'Pending'
-                            : mail.status == MailStatus.approved
-                                ? 'Approved'
-                                : 'Declined',
-                        style: TextStyle(color: textColor),
-                      ),
-                    ],
-                  ),
-                  Text(
-                    'Content: ${mail.isi}',
-                    style: TextStyle(color: textColor),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  Text(
-                    'Category: ${mail.kategori}',
-                    style: TextStyle(color: textColor),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  if (mail.status == MailStatus.declined && mail.alasan != null)
-                    Text(
-                      'Reason: ${mail.alasan}',
-                      style: TextStyle(color: Colors.red),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  if (mail.status == MailStatus.declined && mail.alasan == null)
-                    Text(
-                      'Mails declined without reason.',
-                      style: TextStyle(color: Colors.red),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                ],
-              ),
-            ),
-          );
-        },
-        body: Container(
+            );
+          },
+          body: Container(
             color: cardColor,
             child: ListTile(
               title: Column(
@@ -382,11 +382,11 @@ class _OutboxUser extends State<OutboxUser> {
               ),
             ),
           ),
-        isExpanded: mail.isExpanded,
-      );
-    }).toList(),
-  );
-}
+          isExpanded: mail.isExpanded,
+        );
+      }).toList(),
+    );
+  }
 
   Widget _buildMailImage(MailItem mail) {
     if (mail.imagePath != null) {

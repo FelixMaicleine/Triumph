@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, use_key_in_widget_constructors, library_private_types_in_public_api, prefer_final_fields, prefer_const_literals_to_create_immutables, use_super_parameters, no_leading_underscores_for_local_identifiers
+// ignore_for_file: prefer_const_constructors, use_key_in_widget_constructors, library_private_types_in_public_api, prefer_final_fields, prefer_const_literals_to_create_immutables, use_super_parameters, no_leading_underscores_for_local_identifiers, unused_element
 
 import 'package:flutter/material.dart';
 import 'dart:io';
@@ -6,12 +6,12 @@ import 'package:provider/provider.dart';
 import 'package:triumph2/provider/theme.dart';
 import 'package:triumph2/provider/mailprovider.dart';
 
-class DeclinedAdmin extends StatefulWidget {
+class FavAdmin extends StatefulWidget {
   @override
-  _DeclinedAdmin createState() => _DeclinedAdmin();
+  _FavAdmin createState() => _FavAdmin();
 }
 
-class _DeclinedAdmin extends State<DeclinedAdmin> {
+class _FavAdmin extends State<FavAdmin> {
   late List<MailItem> _filteredmailss;
   late String _selectedFilter;
   late String _searchQuery;
@@ -28,21 +28,20 @@ class _DeclinedAdmin extends State<DeclinedAdmin> {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final ThemeData themeData = themeProvider.getCurrentTheme();
     final Color textColor = themeData.textTheme.bodyLarge!.color!;
+    final Color bottomNavBarColor =
+        themeProvider.enableDarkMode ? Colors.grey.shade900 : Colors.white;
     final Color chipBackgroundColor = themeProvider.enableDarkMode
         ? Colors.grey.shade700
         : Colors.grey.shade300;
     final Color chipSelectedColor = themeProvider.enableDarkMode
         ? Colors.red.shade800
         : Colors.red.shade400;
-    final Color bottomNavBarColor =
-        themeProvider.enableDarkMode ? Colors.grey.shade900 : Colors.white;
     final Color cardColor =
         themeProvider.enableDarkMode ? Colors.grey.shade800 : Colors.white;
     final mailProvider = Provider.of<MailProvider>(context);
     _filteredmailss = _getFilteredMails(mailProvider.mailss);
-    final declinedMails = _filteredmailss
-        .where((mail) => mail.status == MailStatus.declined)
-        .toList();
+    final starredMails =
+        _filteredmailss.where((mail) => mail.isStarred == true).toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -98,7 +97,7 @@ class _DeclinedAdmin extends State<DeclinedAdmin> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Declined Mails',
+                      'Favorite Mails',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -106,74 +105,56 @@ class _DeclinedAdmin extends State<DeclinedAdmin> {
                       ),
                     ),
                     _buildExpansionPanelList(
-                        declinedMails, textColor, cardColor, mailProvider),
+                        starredMails, textColor, cardColor, mailProvider),
                   ],
                 ),
               ),
             ),
             Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  TextField(
-                    decoration: InputDecoration(
-                      prefixIcon: Icon(Icons.search, color: textColor),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: textColor),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: textColor),
-                      ),
-                    ),
-                    style: TextStyle(color: textColor),
-                    onChanged: (value) {
-                      setState(() {
-                        _searchQuery = value;
-                      });
-                    },
-                  ),
-                  SizedBox(height: 15),
-                  Row(
-                    children: [
-                      IconButton(
-                        icon: Icon(
-                          _selectedFilter == 'Starred'
-                              ? Icons.star
-                              : Icons.star_border,
-                          color: _selectedFilter == 'Starred'
-                              ? Colors.yellow
-                              : textColor,
+                top: 0,
+                left: 0,
+                right: 0,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    TextField(
+                      decoration: InputDecoration(
+                        prefixIcon: Icon(Icons.search, color: textColor),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: textColor),
                         ),
-                        onPressed: () {
-                          setState(() {
-                            _selectedFilter = _selectedFilter == 'Starred'
-                                ? 'All'
-                                : 'Starred';
-                          });
-                        },
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: textColor),
+                        ),
                       ),
-                      Wrap(
-                        spacing: 5.0,
-                        children: [
-                          _buildFilterChip('All', textColor,
-                              chipBackgroundColor, chipSelectedColor),
-                          _buildFilterChip('Personal', textColor,
-                              chipBackgroundColor, chipSelectedColor),
-                          _buildFilterChip('Work', textColor,
-                              chipBackgroundColor, chipSelectedColor),
-                          _buildFilterChip('Others', textColor,
-                              chipBackgroundColor, chipSelectedColor),
-                        ],
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 10),
-                ],
-              ),
-            ),
+                      style: TextStyle(color: textColor),
+                      onChanged: (value) {
+                        setState(() {
+                          _searchQuery = value;
+                        });
+                      },
+                    ),
+                    SizedBox(height: 15),
+                    Row(
+                      children: [
+                        Wrap(
+                          spacing: 5.0,
+                          children: [
+                            _buildFilterChip('All', textColor,
+                                chipBackgroundColor, chipSelectedColor),
+                            _buildFilterChip('Personal', textColor,
+                                chipBackgroundColor, chipSelectedColor),
+                            _buildFilterChip('Work', textColor,
+                                chipBackgroundColor, chipSelectedColor),
+                            _buildFilterChip('Others', textColor,
+                                chipBackgroundColor, chipSelectedColor),
+                          ],
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 10),
+                  ],
+                )),
           ],
         ),
       ),
@@ -188,13 +169,16 @@ class _DeclinedAdmin extends State<DeclinedAdmin> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.close),
-            label: 'Declined',
+            icon: Icon(Icons.star),
+            label: 'Favorite',
           ),
         ],
         onTap: (int index) {
           if (index == 0) {
             Navigator.pushNamed(context, '/homeadmin');
+          }
+          if (index == 2) {
+            Navigator.pushNamed(context, '/create');
           }
         },
       ),
@@ -431,19 +415,21 @@ class _DeclinedAdmin extends State<DeclinedAdmin> {
     }
   }
 
-  FilterChip _buildFilterChip(String label, Color chipLabelColor,
+  Widget _buildFilterChip(String label, Color textColor,
       Color chipBackgroundColor, Color chipSelectedColor) {
-    return FilterChip(
+    return ChoiceChip(
       label: Text(label),
-      labelStyle: TextStyle(color: chipLabelColor),
-      backgroundColor: chipBackgroundColor,
-      selectedColor: chipSelectedColor,
       selected: _selectedFilter == label,
-      onSelected: (isSelected) {
+      onSelected: (selected) {
         setState(() {
           _selectedFilter = label;
         });
       },
+      selectedColor: chipSelectedColor,
+      backgroundColor: chipBackgroundColor,
+      labelStyle: TextStyle(
+        color: _selectedFilter == label ? Colors.white : textColor,
+      ),
     );
   }
 
@@ -483,24 +469,24 @@ class _DeclinedAdmin extends State<DeclinedAdmin> {
   }
 
   void _showDeleteConfirmationDialog(
-      BuildContext context, String nama, MailProvider mailProvider) {
+      BuildContext context, String mailName, MailProvider mailProvider) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Konfirmasi'),
+          title: Text('Konfirmasi Hapus'),
           content: Text('Apakah Anda yakin ingin menghapus surat ini?'),
           actions: <Widget>[
             TextButton(
-              child: Text('Tidak'),
+              child: Text('Batal'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: Text('Ya'),
+              child: Text('Hapus'),
               onPressed: () {
-                mailProvider.deleteMail(nama);
+                mailProvider.deleteMail(mailName);
                 Navigator.of(context).pop();
               },
             ),

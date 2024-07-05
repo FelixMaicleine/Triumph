@@ -362,13 +362,42 @@ class _MailsUser extends State<MailsUser> {
           );
         },
         body: Container(
-          color: cardColor,
-          child: Column(
-            children: [
-              _buildMailImage(mail),
-            ],
+            color: cardColor,
+            child: ListTile(
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Name: ${mail.nama}',
+                    style: TextStyle(color: textColor),
+                  ),
+                  Text(
+                    'Date: ${mail.dateTime}',
+                    style: TextStyle(color: textColor),
+                  ),
+                  Text(
+                    'Category: ${mail.kategori}',
+                    style: TextStyle(color: textColor),
+                  ),
+                  Text(
+                    'Content: ${mail.isi}',
+                    style: TextStyle(color: textColor),
+                  ),
+                  Text(
+                    'Approval Status: ${mail.status}',
+                    style: TextStyle(color: textColor),
+                  ),
+                  if (mail.status == MailStatus.declined &&
+                      mail.alasan != null)
+                    Text(
+                      'Rejection Reason: ${mail.alasan}',
+                      style: TextStyle(color: textColor),
+                    ),
+                  _buildMailImage(mail),
+                ],
+              ),
+            ),
           ),
-        ),
         isExpanded: mail.isExpanded,
       );
     }).toList(),

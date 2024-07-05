@@ -1,18 +1,18 @@
-// ignore_for_file: prefer_const_constructors, use_key_in_widget_constructors, library_private_types_in_public_api, prefer_final_fields, prefer_const_literals_to_create_immutables, use_super_parameters, no_leading_underscores_for_local_identifiers, unused_element
+// ignore_for_file: prefer_const_constructors, use_key_in_widget_constructors, library_private_types_in_public_api, prefer_final_fields, prefer_const_literals_to_create_immutables, use_super_parameters, file_names, sized_box_for_whitespace
 
 import 'package:flutter/material.dart';
-import 'dart:io';
 import 'package:provider/provider.dart';
 import 'package:triumph2/provider/theme.dart';
 import 'package:triumph2/provider/mailprovider.dart';
+import 'dart:io';
 
-class MailsAdmin extends StatefulWidget {
+class Draft extends StatefulWidget {
   @override
-  _MailsAdmin createState() => _MailsAdmin();
+  _DraftState createState() => _DraftState();
 }
 
-class _MailsAdmin extends State<MailsAdmin> {
-  late List<MailItem> _filteredmailss;
+class _DraftState extends State<Draft> {
+  late List<MailItem> _filteredMails;
   late String _selectedFilter;
   late String _searchQuery;
 
@@ -39,16 +39,7 @@ class _MailsAdmin extends State<MailsAdmin> {
     final Color cardColor =
         themeProvider.enableDarkMode ? Colors.grey.shade800 : Colors.white;
     final mailProvider = Provider.of<MailProvider>(context);
-    _filteredmailss = _getFilteredMails(mailProvider.mailss);
-    final pendingMails = _filteredmailss
-        .where((mail) => mail.status == MailStatus.pending)
-        .toList();
-    final approvedMails = _filteredmailss
-        .where((mail) => mail.status == MailStatus.approved)
-        .toList();
-    final declinedMails = _filteredmailss
-        .where((mail) => mail.status == MailStatus.declined)
-        .toList();
+    _filteredMails = _getFilteredMails(mailProvider.draftMails);
 
     return Scaffold(
       appBar: AppBar(
@@ -104,7 +95,7 @@ class _MailsAdmin extends State<MailsAdmin> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Inbox',
+                      'Drafts',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -112,18 +103,7 @@ class _MailsAdmin extends State<MailsAdmin> {
                       ),
                     ),
                     _buildExpansionPanelList(
-                        pendingMails, textColor, cardColor, mailProvider),
-                    SizedBox(height: 20),
-                    Text(
-                      'Outbox',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: textColor,
-                      ),
-                    ),
-                    _buildExpansionPanelList(approvedMails + declinedMails,
-                        textColor, cardColor, mailProvider),
+                        _filteredMails, textColor, cardColor, mailProvider),
                   ],
                 ),
               ),
@@ -204,13 +184,17 @@ class _MailsAdmin extends State<MailsAdmin> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.mail),
-            label: 'Mails',
+            icon: Icon(Icons.drafts),
+            label: 'Draft',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.edit_document),
+            label: 'Create Mail',
           ),
         ],
         onTap: (int index) {
           if (index == 0) {
-            Navigator.pushNamed(context, '/homeadmin');
+            Navigator.pushNamed(context, '/homeuser');
           }
           if (index == 2) {
             Navigator.pushNamed(context, '/create');
@@ -220,15 +204,15 @@ class _MailsAdmin extends State<MailsAdmin> {
     );
   }
 
-  List<MailItem> _getFilteredMails(List<MailItem> mailss) {
-    return mailss.where((mails) {
+  List<MailItem> _getFilteredMails(List<MailItem> mails) {
+    return mails.where((mail) {
       final matchesFilter = _selectedFilter == 'All'
           ? true
           : _selectedFilter == 'Starred'
-              ? mails.isStarred
-              : mails.kategori == _selectedFilter;
+              ? mail.isStarred
+              : mail.kategori == _selectedFilter;
       final matchesSearch =
-          mails.nama.toLowerCase().contains(_searchQuery.toLowerCase());
+          mail.nama.toLowerCase().contains(_searchQuery.toLowerCase());
       return matchesFilter && matchesSearch;
     }).toList();
   }
@@ -269,40 +253,28 @@ class _MailsAdmin extends State<MailsAdmin> {
                             ),
                           ],
                         ),
-                        if (mail.status == MailStatus.pending)
-                          Row(
-                            children: [
-                              IconButton(
-                                icon: Icon(
-                                  Icons.check,
-                                  color: Colors.green,
-                                ),
-                                onPressed: () {
-                                  mailProvider.changeMailStatus(
-                                      mail.nama, MailStatus.approved);
-                                },
+                        Row(
+                          children: [
+                            IconButton(
+                              icon: Icon(
+                                Icons.edit,
+                                color: Colors.blue,
                               ),
-                              IconButton(
-                                icon: Icon(
-                                  Icons.clear,
-                                  color: Colors.red,
-                                ),
-                                onPressed: () {
-                                  _showdeclinedDialog(
-                                      context, mail, mailProvider);
-                                },
+                              onPressed: () {
+                                Navigator.pushNamed(
+                                    context, '/create', arguments: mail);
+                              },
+                            ),
+                            IconButton(
+                              icon: Icon(
+                                Icons.delete,
+                                color: Colors.red,
                               ),
-                            ],
-                          ),
-                        IconButton(
-                          icon: Icon(
-                            Icons.delete,
-                            color: Colors.red,
-                          ),
-                          onPressed: () {
-                            _showDeleteConfirmationDialog(
-                                context, mail.nama, mailProvider);
-                          },
+                              onPressed: () {
+                                mailProvider.deleteDraftMail(mail.nama);
+                              },
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -332,28 +304,6 @@ class _MailsAdmin extends State<MailsAdmin> {
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.circle,
-                          color: mail.status == MailStatus.pending
-                              ? Colors.grey
-                              : mail.status == MailStatus.approved
-                                  ? Colors.green
-                                  : Colors.red,
-                          size: 12,
-                        ),
-                        SizedBox(width: 5),
-                        Text(
-                          mail.status == MailStatus.pending
-                              ? 'Pending'
-                              : mail.status == MailStatus.approved
-                                  ? 'Approved'
-                                  : 'Declined',
-                          style: TextStyle(color: textColor),
-                        ),
-                      ],
-                    ),
                     Text(
                       'Content: ${mail.isi}',
                       style: TextStyle(color: textColor),
@@ -364,20 +314,6 @@ class _MailsAdmin extends State<MailsAdmin> {
                       style: TextStyle(color: textColor),
                       overflow: TextOverflow.ellipsis,
                     ),
-                    if (mail.status == MailStatus.declined &&
-                        mail.alasan != null)
-                      Text(
-                        'Reason: ${mail.alasan}',
-                        style: TextStyle(color: Colors.red),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    if (mail.status == MailStatus.declined &&
-                        mail.alasan == null)
-                      Text(
-                        'Mails declined without reason.',
-                        style: TextStyle(color: Colors.red),
-                        overflow: TextOverflow.ellipsis,
-                      ),
                   ],
                 ),
               ),
@@ -405,16 +341,6 @@ class _MailsAdmin extends State<MailsAdmin> {
                     'Content: ${mail.isi}',
                     style: TextStyle(color: textColor),
                   ),
-                  Text(
-                    'Approval Status: ${mail.status}',
-                    style: TextStyle(color: textColor),
-                  ),
-                  if (mail.status == MailStatus.declined &&
-                      mail.alasan != null)
-                    Text(
-                      'Rejection Reason: ${mail.alasan}',
-                      style: TextStyle(color: textColor),
-                    ),
                   _buildMailImage(mail),
                 ],
               ),
@@ -450,83 +376,23 @@ class _MailsAdmin extends State<MailsAdmin> {
     }
   }
 
-  Widget _buildFilterChip(String label, Color textColor,
+  Widget _buildFilterChip(String filter, Color textColor,
       Color chipBackgroundColor, Color chipSelectedColor) {
-    return ChoiceChip(
-      label: Text(label),
-      selected: _selectedFilter == label,
+    final bool isSelected = _selectedFilter == filter;
+    return FilterChip(
+      label: Text(
+        filter,
+        style: TextStyle(
+          color: isSelected ? Colors.white : textColor,
+        ),
+      ),
+      backgroundColor: chipBackgroundColor,
+      selectedColor: chipSelectedColor,
+      selected: isSelected,
       onSelected: (selected) {
         setState(() {
-          _selectedFilter = label;
+          _selectedFilter = selected ? filter : 'All';
         });
-      },
-      selectedColor: chipSelectedColor,
-      backgroundColor: chipBackgroundColor,
-      labelStyle: TextStyle(
-        color: _selectedFilter == label ? Colors.white : textColor,
-      ),
-    );
-  }
-
-  void _showdeclinedDialog(
-      BuildContext context, MailItem mail, MailProvider mailProvider) {
-    TextEditingController _reasonController = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Alasan tidak disetujui'),
-          content: TextField(
-            controller: _reasonController,
-            decoration: InputDecoration(hintText: 'Masukkan alasan'),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Batal'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: Text('Kirim'),
-              onPressed: () {
-                String reason = _reasonController.text.trim();
-                mailProvider.changeMailStatus(mail.nama, MailStatus.declined,
-                    alasan: reason);
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _showDeleteConfirmationDialog(
-      BuildContext context, String mailName, MailProvider mailProvider) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Konfirmasi Hapus'),
-          content: Text('Apakah Anda yakin ingin menghapus surat ini?'),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Batal'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: Text('Hapus'),
-              onPressed: () {
-                mailProvider.deleteMail(mailName);
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
       },
     );
   }

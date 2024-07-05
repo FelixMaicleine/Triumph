@@ -18,6 +18,7 @@ class MailItem {
   bool isDefaultImage;
   bool isExpanded;
   bool isStarred;
+  bool isDeleted;
 
   MailItem({
     required this.nama,
@@ -30,12 +31,16 @@ class MailItem {
     this.isDefaultImage = false,
     this.isExpanded = false,
     this.isStarred = false,
+    this.isDeleted = false,
   });
 }
 
 class MailProvider with ChangeNotifier {
   List<MailItem> _mailss = [];
-  List<MailItem> get mailss => _mailss;
+  List<MailItem> _draftMails = [];
+  List<MailItem> get mailss =>
+      _mailss.where((mail) => !mail.isDeleted).toList();
+  List<MailItem> get draftMails => _draftMails;
   List<MailItem> get pendingMails =>
       _mailss.where((mail) => mail.status == MailStatus.pending).toList();
   List<MailItem> get approvedMails =>
@@ -44,6 +49,8 @@ class MailProvider with ChangeNotifier {
       _mailss.where((mail) => mail.status == MailStatus.declined).toList();
   List<MailItem> get starredMails =>
       _mailss.where((mail) => mail.isStarred).toList();
+  List<MailItem> get deletedMails =>
+      _mailss.where((mail) => mail.isDeleted).toList();
 
   MailProvider() {
     _mailss = [
@@ -103,6 +110,17 @@ class MailProvider with ChangeNotifier {
     ];
   }
 
+  Future<void> addDraftMail(MailItem mail) async {
+    await Future.delayed(const Duration(seconds: 1));
+    _draftMails.add(mail);
+    notifyListeners();
+  }
+
+  void deleteDraftMail(String nama) {
+    _draftMails.removeWhere((mail) => mail.nama == nama);
+    notifyListeners();
+  }
+
   Future<void> addMail(MailItem mail) async {
     await Future.delayed(const Duration(seconds: 1));
     _mailss.add(mail);
@@ -118,6 +136,22 @@ class MailProvider with ChangeNotifier {
   }
 
   void deleteMail(String nama) {
+    final mailIndex = _mailss.indexWhere((mail) => mail.nama == nama);
+    if (mailIndex != -1) {
+      _mailss[mailIndex].isDeleted = true;
+      notifyListeners();
+    }
+  }
+
+  void restoreMail(String nama) {
+    final mailIndex = _mailss.indexWhere((mail) => mail.nama == nama);
+    if (mailIndex != -1) {
+      _mailss[mailIndex].isDeleted = false;
+      notifyListeners();
+    }
+  }
+
+  void permanentlyDeleteMail(String nama) {
     _mailss.removeWhere((mail) => mail.nama == nama);
     notifyListeners();
   }

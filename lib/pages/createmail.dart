@@ -126,6 +126,37 @@ class _CreateMailState extends State<CreateMail> {
     Navigator.pop(context);
   }
 
+  Future<void> _saveDraft(
+    BuildContext context, MailProvider mailProvider) async {
+  _showLoadingDialog(context);
+
+  final DateTime selectedDateTime = DateTime(
+    _selectedDate.year,
+    _selectedDate.month,
+    _selectedDate.day,
+    _selectedTime.hour,
+    _selectedTime.minute,
+  );
+
+  final draftMail = MailItem(
+    nama: _namaController.text,
+    isi: _isiController.text,
+    kategori: _selectedCategory,
+    dateTime: selectedDateTime,
+  );
+
+  if (_selectedImage != null) {
+    draftMail.imagePath = _selectedImage!.path;
+  }
+
+  await mailProvider.addDraftMail(draftMail);
+
+  _hideLoadingDialog(context);
+
+  _showSnackBar(context);
+}
+
+
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
@@ -144,7 +175,10 @@ class _CreateMailState extends State<CreateMail> {
             Icons.arrow_back_ios,
             color: Colors.red,
           ),
-          onPressed: () {
+          onPressed: () async {
+            if (_namaController.text.isNotEmpty || _isiController.text.isNotEmpty) {
+              await _saveDraft(context, mailProvider);
+            }
             Navigator.pop(context);
           },
         ),
@@ -381,7 +415,10 @@ class _CreateMailState extends State<CreateMail> {
                     children: [
                       Expanded(
                           child: ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async {
+                          if (_namaController.text.isNotEmpty || _isiController.text.isNotEmpty) {
+                            await _saveDraft(context, mailProvider);
+                          }
                           Navigator.pop(context);
                         },
                         style: ElevatedButton.styleFrom(

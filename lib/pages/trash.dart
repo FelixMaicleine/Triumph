@@ -1,4 +1,5 @@
-// ignore_for_file: prefer_const_constructors, use_key_in_widget_constructors, library_private_types_in_public_api, prefer_final_fields, prefer_const_literals_to_create_immutables, use_super_parameters, no_leading_underscores_for_local_identifiers
+// ignore_for_file: prefer_const_constructors, use_key_in_widget_constructors, library_private_types_in_public_api, prefer_final_fields, prefer_const_literals_to_create_immutables, use_super_parameters, file_names, sized_box_for_whitespace
+
 
 import 'package:flutter/material.dart';
 import 'dart:io';
@@ -6,13 +7,13 @@ import 'package:provider/provider.dart';
 import 'package:triumph2/provider/theme.dart';
 import 'package:triumph2/provider/mailprovider.dart';
 
-class DeclinedAdmin extends StatefulWidget {
+class Trash extends StatefulWidget {
   @override
-  _DeclinedAdmin createState() => _DeclinedAdmin();
+  _Trash createState() => _Trash();
 }
 
-class _DeclinedAdmin extends State<DeclinedAdmin> {
-  late List<MailItem> _filteredmailss;
+class _Trash extends State<Trash> {
+  late List<MailItem> _filteredMails;
   late String _selectedFilter;
   late String _searchQuery;
 
@@ -28,21 +29,18 @@ class _DeclinedAdmin extends State<DeclinedAdmin> {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final ThemeData themeData = themeProvider.getCurrentTheme();
     final Color textColor = themeData.textTheme.bodyLarge!.color!;
+    final Color bottomNavBarColor =
+        themeProvider.enableDarkMode ? Colors.grey.shade900 : Colors.white;
     final Color chipBackgroundColor = themeProvider.enableDarkMode
         ? Colors.grey.shade700
         : Colors.grey.shade300;
     final Color chipSelectedColor = themeProvider.enableDarkMode
         ? Colors.red.shade800
         : Colors.red.shade400;
-    final Color bottomNavBarColor =
-        themeProvider.enableDarkMode ? Colors.grey.shade900 : Colors.white;
     final Color cardColor =
         themeProvider.enableDarkMode ? Colors.grey.shade800 : Colors.white;
     final mailProvider = Provider.of<MailProvider>(context);
-    _filteredmailss = _getFilteredMails(mailProvider.mailss);
-    final declinedMails = _filteredmailss
-        .where((mail) => mail.status == MailStatus.declined)
-        .toList();
+    _filteredMails = _getFilteredMails(mailProvider.deletedMails);
 
     return Scaffold(
       appBar: AppBar(
@@ -98,7 +96,7 @@ class _DeclinedAdmin extends State<DeclinedAdmin> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Declined Mails',
+                      'Trash',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -106,74 +104,73 @@ class _DeclinedAdmin extends State<DeclinedAdmin> {
                       ),
                     ),
                     _buildExpansionPanelList(
-                        declinedMails, textColor, cardColor, mailProvider),
+                        _filteredMails, textColor, cardColor, mailProvider),
                   ],
                 ),
               ),
             ),
             Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  TextField(
-                    decoration: InputDecoration(
-                      prefixIcon: Icon(Icons.search, color: textColor),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: textColor),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: textColor),
-                      ),
-                    ),
-                    style: TextStyle(color: textColor),
-                    onChanged: (value) {
-                      setState(() {
-                        _searchQuery = value;
-                      });
-                    },
-                  ),
-                  SizedBox(height: 15),
-                  Row(
-                    children: [
-                      IconButton(
-                        icon: Icon(
-                          _selectedFilter == 'Starred'
-                              ? Icons.star
-                              : Icons.star_border,
-                          color: _selectedFilter == 'Starred'
-                              ? Colors.yellow
-                              : textColor,
+                top: 0,
+                left: 0,
+                right: 0,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    TextField(
+                      decoration: InputDecoration(
+                        prefixIcon: Icon(Icons.search, color: textColor),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: textColor),
                         ),
-                        onPressed: () {
-                          setState(() {
-                            _selectedFilter = _selectedFilter == 'Starred'
-                                ? 'All'
-                                : 'Starred';
-                          });
-                        },
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: textColor),
+                        ),
                       ),
-                      Wrap(
-                        spacing: 5.0,
-                        children: [
-                          _buildFilterChip('All', textColor,
-                              chipBackgroundColor, chipSelectedColor),
-                          _buildFilterChip('Personal', textColor,
-                              chipBackgroundColor, chipSelectedColor),
-                          _buildFilterChip('Work', textColor,
-                              chipBackgroundColor, chipSelectedColor),
-                          _buildFilterChip('Others', textColor,
-                              chipBackgroundColor, chipSelectedColor),
-                        ],
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 10),
-                ],
-              ),
-            ),
+                      style: TextStyle(color: textColor),
+                      onChanged: (value) {
+                        setState(() {
+                          _searchQuery = value;
+                        });
+                      },
+                    ),
+                    SizedBox(height: 15),
+                    Row(
+                      children: [
+                        IconButton(
+                          icon: Icon(
+                            _selectedFilter == 'Starred'
+                                ? Icons.star
+                                : Icons.star_border,
+                            color: _selectedFilter == 'Starred'
+                                ? Colors.yellow
+                                : textColor,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _selectedFilter = _selectedFilter == 'Starred'
+                                  ? 'All'
+                                  : 'Starred';
+                            });
+                          },
+                        ),
+                        Wrap(
+                          spacing: 5.0,
+                          children: [
+                            _buildFilterChip('All', textColor,
+                                chipBackgroundColor, chipSelectedColor),
+                            _buildFilterChip('Personal', textColor,
+                                chipBackgroundColor, chipSelectedColor),
+                            _buildFilterChip('Work', textColor,
+                                chipBackgroundColor, chipSelectedColor),
+                            _buildFilterChip('Others', textColor,
+                                chipBackgroundColor, chipSelectedColor),
+                          ],
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 10),
+                  ],
+                )),
           ],
         ),
       ),
@@ -188,28 +185,31 @@ class _DeclinedAdmin extends State<DeclinedAdmin> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.close),
-            label: 'Declined',
+            icon: Icon(Icons.delete),
+            label: 'Trash',
           ),
         ],
         onTap: (int index) {
           if (index == 0) {
             Navigator.pushNamed(context, '/homeadmin');
           }
+          if (index == 2) {
+            Navigator.pushNamed(context, '/create');
+          }
         },
       ),
     );
   }
 
-  List<MailItem> _getFilteredMails(List<MailItem> mailss) {
-    return mailss.where((mails) {
+  List<MailItem> _getFilteredMails(List<MailItem> mails) {
+    return mails.where((mail) {
       final matchesFilter = _selectedFilter == 'All'
           ? true
           : _selectedFilter == 'Starred'
-              ? mails.isStarred
-              : mails.kategori == _selectedFilter;
+              ? mail.isStarred
+              : mail.kategori == _selectedFilter;
       final matchesSearch =
-          mails.nama.toLowerCase().contains(_searchQuery.toLowerCase());
+          mail.nama.toLowerCase().contains(_searchQuery.toLowerCase());
       return matchesFilter && matchesSearch;
     }).toList();
   }
@@ -250,40 +250,28 @@ class _DeclinedAdmin extends State<DeclinedAdmin> {
                             ),
                           ],
                         ),
-                        if (mail.status == MailStatus.pending)
-                          Row(
-                            children: [
-                              IconButton(
-                                icon: Icon(
-                                  Icons.check,
-                                  color: Colors.green,
-                                ),
-                                onPressed: () {
-                                  mailProvider.changeMailStatus(
-                                      mail.nama, MailStatus.approved);
-                                },
+                        Row(
+                          children: [
+                            IconButton(
+                              icon: Icon(
+                                Icons.restore,
+                                color: Colors.green,
                               ),
-                              IconButton(
-                                icon: Icon(
-                                  Icons.clear,
-                                  color: Colors.red,
-                                ),
-                                onPressed: () {
-                                  _showdeclinedDialog(
-                                      context, mail, mailProvider);
-                                },
+                              onPressed: () {
+                                mailProvider.restoreMail(mail.nama);
+                              },
+                            ),
+                            IconButton(
+                              icon: Icon(
+                                Icons.delete_forever,
+                                color: Colors.red,
                               ),
-                            ],
-                          ),
-                        IconButton(
-                          icon: Icon(
-                            Icons.delete,
-                            color: Colors.red,
-                          ),
-                          onPressed: () {
-                            _showDeleteConfirmationDialog(
-                                context, mail.nama, mailProvider);
-                          },
+                              onPressed: () {
+                                _showPermanentlyDeleteDialog(
+                                    context, mail.nama, mailProvider);
+                              },
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -317,20 +305,12 @@ class _DeclinedAdmin extends State<DeclinedAdmin> {
                       children: [
                         Icon(
                           Icons.circle,
-                          color: mail.status == MailStatus.pending
-                              ? Colors.grey
-                              : mail.status == MailStatus.approved
-                                  ? Colors.green
-                                  : Colors.red,
+                          color: Colors.red,
                           size: 12,
                         ),
                         SizedBox(width: 5),
                         Text(
-                          mail.status == MailStatus.pending
-                              ? 'Pending'
-                              : mail.status == MailStatus.approved
-                                  ? 'Approved'
-                                  : 'Declined',
+                          'Deleted',
                           style: TextStyle(color: textColor),
                         ),
                       ],
@@ -348,16 +328,8 @@ class _DeclinedAdmin extends State<DeclinedAdmin> {
                     if (mail.status == MailStatus.declined &&
                         mail.alasan != null)
                       Text(
-                        'Reason: ${mail.alasan}',
-                        style: TextStyle(color: Colors.red),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    if (mail.status == MailStatus.declined &&
-                        mail.alasan == null)
-                      Text(
-                        'Mails declined without reason.',
-                        style: TextStyle(color: Colors.red),
-                        overflow: TextOverflow.ellipsis,
+                        'Rejection Reason: ${mail.alasan}',
+                        style: TextStyle(color: textColor),
                       ),
                   ],
                 ),
@@ -431,78 +403,50 @@ class _DeclinedAdmin extends State<DeclinedAdmin> {
     }
   }
 
-  FilterChip _buildFilterChip(String label, Color chipLabelColor,
+
+  Widget _buildFilterChip(String filter, Color textColor,
       Color chipBackgroundColor, Color chipSelectedColor) {
+    final bool isSelected = _selectedFilter == filter;
     return FilterChip(
-      label: Text(label),
-      labelStyle: TextStyle(color: chipLabelColor),
+      label: Text(
+        filter,
+        style: TextStyle(
+          color: isSelected ? Colors.white : textColor,
+        ),
+      ),
       backgroundColor: chipBackgroundColor,
       selectedColor: chipSelectedColor,
-      selected: _selectedFilter == label,
-      onSelected: (isSelected) {
+      selected: isSelected,
+      onSelected: (selected) {
         setState(() {
-          _selectedFilter = label;
+          _selectedFilter = selected ? filter : 'All';
         });
       },
     );
   }
 
-  void _showdeclinedDialog(
-      BuildContext context, MailItem mail, MailProvider mailProvider) {
-    TextEditingController _reasonController = TextEditingController();
-
+  void _showPermanentlyDeleteDialog(
+      BuildContext context, String mailName, MailProvider mailProvider) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Alasan tidak disetujui'),
-          content: TextField(
-            controller: _reasonController,
-            decoration: InputDecoration(hintText: 'Masukkan alasan'),
-          ),
-          actions: <Widget>[
+          title: Text('Permanently Delete Mail'),
+          content: Text(
+              'Are you sure you want to permanently delete this mail? This action cannot be undone.'),
+          actions: [
             TextButton(
-              child: Text('Batal'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
+              child: Text('Cancel'),
             ),
             TextButton(
-              child: Text('Kirim'),
               onPressed: () {
-                String reason = _reasonController.text.trim();
-                mailProvider.changeMailStatus(mail.nama, MailStatus.declined,
-                    alasan: reason);
+                mailProvider.permanentlyDeleteMail(mailName);
                 Navigator.of(context).pop();
               },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _showDeleteConfirmationDialog(
-      BuildContext context, String nama, MailProvider mailProvider) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Konfirmasi'),
-          content: Text('Apakah Anda yakin ingin menghapus surat ini?'),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Tidak'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: Text('Ya'),
-              onPressed: () {
-                mailProvider.deleteMail(nama);
-                Navigator.of(context).pop();
-              },
+              child: Text('Delete'),
             ),
           ],
         );
