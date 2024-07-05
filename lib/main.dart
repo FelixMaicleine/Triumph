@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:triumph2/pages/approvedadmin.dart';
 import 'package:triumph2/pages/declinedadmin.dart';
+import 'package:triumph2/pages/editprofileadmin.dart';
 import 'package:triumph2/pages/inboxuser.dart';
-import 'package:triumph2/pages/editprofile.dart';
+import 'package:triumph2/pages/editprofileuser.dart';
 import 'package:triumph2/pages/homea.dart';
 import 'package:triumph2/pages/homeu.dart';
 import 'package:triumph2/pages/mailsadmin.dart';
@@ -10,7 +11,8 @@ import 'package:triumph2/pages/loginadmin.dart';
 import 'package:triumph2/pages/pendingadmin.dart';
 import 'package:triumph2/pages/outboxuser.dart';
 import 'package:triumph2/pages/peran.dart';
-import 'package:triumph2/pages/profile.dart';
+import 'package:triumph2/pages/profileadmin.dart';
+import 'package:triumph2/pages/profileuser.dart';
 import 'package:triumph2/pages/landing.dart';
 import 'package:triumph2/pages/loginuser.dart';
 import 'package:triumph2/pages/register.dart';
@@ -56,9 +58,10 @@ class MyApp extends StatelessWidget {
         '/mailsuser': (context) => MailsUser(),
         '/mailsadmin': (context) => MailsAdmin(),
         '/create': (context) => CreateMail(),
-        '/profile': (context) => Profile(),
-        '/editprofile': (context) => EditProfile(),
-        
+        '/profileuser': (context) => ProfileUser(),
+        '/profileadmin': (context) => ProfileAdmin(),
+        '/editprofileuser': (context) => EditProfileUser(),
+        '/editprofileadmin': (context) => EditProfileAdmin(),
         '/pendingadmin': (context) => PendingAdmin(),
         '/approvedadmin': (context) => ApprovedAdmin(),
         '/notapprovedadmin': (context) => DeclinedAdmin(),

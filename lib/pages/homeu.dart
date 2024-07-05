@@ -130,7 +130,7 @@ class _HomeU extends State<HomeU> {
                           style: TextStyle(color: textColor),
                         ),
                         onTap: () {
-                          Navigator.pushNamed(context, '/profile');
+                          Navigator.pushNamed(context, '/profileuser');
                         },
                       ),
                       ListTile(

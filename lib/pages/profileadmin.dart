@@ -4,13 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:triumph2/provider/theme.dart';
 
-class Profile extends StatefulWidget {
-  const Profile({super.key});
+class ProfileAdmin extends StatefulWidget {
+  const ProfileAdmin({super.key});
   @override
-  State<Profile> createState() => _ProfileState();
+  State<ProfileAdmin> createState() => _ProfileAdminState();
 }
 
-class _ProfileState extends State<Profile> {
+class _ProfileAdminState extends State<ProfileAdmin> {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
@@ -138,12 +138,27 @@ class _ProfileState extends State<Profile> {
                         ),
                       ],
                     ),
+                    SizedBox(height: 20.0),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: <Widget>[
+                        Icon(Icons.qr_code_2, color: textColor),
+                        SizedBox(width: 10.0),
+                        Text(
+                          'Admin Code : 123abc',
+                          style: TextStyle(
+                            fontSize: 16.0,
+                            color: textColor,
+                          ),
+                        ),
+                      ],
+                    ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         TextButton(
                           onPressed: () {
-                            Navigator.pushNamed(context, '/editprofile');
+                            Navigator.pushNamed(context, '/editprofileadmin');
                           },
                           child: const Text(
                             'Edit Profile',

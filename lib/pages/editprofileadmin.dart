@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:triumph2/provider/theme.dart';
 
-class EditProfile extends StatefulWidget {
-  const EditProfile({super.key});
+class EditProfileAdmin extends StatefulWidget {
+  const EditProfileAdmin({super.key});
 
   @override
-  State<EditProfile> createState() => _EditProfile();
+  State<EditProfileAdmin> createState() => _EditProfileAdmin();
 }
 
-class _EditProfile extends State<EditProfile> {
+class _EditProfileAdmin extends State<EditProfileAdmin> {
   String _selectedGender = 'Not Telling';
   final List<String> _genders = ['Not Telling', 'Male', 'Female'];
   IconData _selectedIcon = Icons.person;
@@ -263,6 +263,37 @@ class _EditProfile extends State<EditProfile> {
                         dropdownColor: themeProvider.enableDarkMode
                             ? Colors.grey.shade800
                             : Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 20),
+                Row(
+                  children: [
+                    Text(
+                      'Admin Code',
+                      style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: textColor),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        style: TextStyle(color: textColor),
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                            borderSide: BorderSide(color: textColor),
+                          ),
+                          hintText: 'Enter your new admin code',
+                          hintStyle: TextStyle(color: textColor),
+                          prefixIcon:
+                              Icon(Icons.qr_code_2, color: textColor),
+                        ),
                       ),
                     ),
                   ],
